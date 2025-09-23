@@ -29,9 +29,13 @@ class Facturado extends Model
         'eps',
         'diagnostico',
         'servicio',
+        'fk_radicado'
     ];
 
-    
+     public function radicado()
+    {
+        return $this->belongsTo(Radicado::class, 'fk_radicado', 'id_radicado');
+    }
 
 
 }

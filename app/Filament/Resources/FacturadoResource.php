@@ -21,214 +21,205 @@ use Filament\Tables\Enums\FiltersLayout;
 use Filament\Forms\Components\TextInput as FTextInput;
 use Filament\Forms\Components\Select as FSelect;
 use Filament\Tables\Actions\Action as TableAction;
+use Filament\Tables\Actions\BulkAction;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Redirect;
+use Filament\Facades\Filament;
 
 class FacturadoResource extends Resource
 {
     protected static ?string $model = Facturado::class;
-     public static function canCreate(): bool
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+
+    public static function canCreate(): bool
     {
         return false;
     }
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getEloquentQuery()->count();
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'warning';
+    }
 
     public static function form(Form $form): Form
     {
         return $form
-            ->schema([
-
-                
-            ]);
+            ->schema([]);
     }
 
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                
+                FBadgeColumn::make('dias_facturado')
+                    ->label('Días facturado')
+                    ->getStateUsing(function ($record) {
+                        if ($record->estado !== 'facturado') {
+                            return null;
+                        }
+                        $fechaIngreso = Carbon::parse($record->fecha_ingreso);
+                        $dias = $fechaIngreso->diffInHours(Carbon::now()) / 24;
+                        return (int) ceil($dias);
+                    })
+                    ->color(function ($state) {
+                        if (is_null($state)) {
+                            return 'gray';
+                        } elseif ($state <= 1) {
+                            return 'success';
+                        } elseif ($state <= 3) {
+                            return 'warning';
+                        }
+                        return 'danger';
+                    }),
 
+                TextColumn::make('T_Dcto')
+                    ->label('Tipo Documento')
+                    ->searchable()
+                    ->sortable(),
 
-FBadgeColumn::make('dias_facturado')
-    ->label('Días facturado')
-    ->getStateUsing(function ($record) {
-        if ($record->estado !== 'facturado') {
-            return null;
-        }
-        $fechaIngreso = Carbon::parse($record->fecha_ingreso);
-        $dias = $fechaIngreso->diffInHours(Carbon::now()) / 24; // diferencia en horas / 24
-        return (int) ceil($dias); // 👈 redondea hacia arriba para aproximar
-    })
-    ->color(function ($state) {
-        if (is_null($state)) {
-            return 'gray';
-        } elseif ($state <= 1) {
-            return 'success';
-        } elseif ($state <= 3) {
-            return 'warning';
-        }
-        return 'danger';
-    }),
+                TextColumn::make('dcto')
+                    ->label('Documento')
+                    ->searchable()
+                    ->sortable(),
 
+                TextColumn::make('nombre')
+                    ->label('Nombre')
+                    ->searchable()
+                    ->sortable(),
 
-                
-    TextColumn::make('T_Dcto')
-            ->label('Tipo Documento')
-            ->searchable()
-            ->sortable(),
+                TextColumn::make('fecha_ingreso')
+                    ->label('Fecha Ingreso')
+                    ->date()
+                    ->sortable(),
 
-             TextColumn::make('dcto')
-            ->label('Documento')
-            ->searchable()
-            ->sortable(),
+                FBadgeColumn::make('estado')
+                    ->label('Estado')
+                    ->formatStateUsing(function ($state) {
+                        try {
+                            return Estado::from($state)->label();
+                        } catch (\ValueError $e) {
+                            return $state;
+                        }
+                    })
+                    ->color(fn (string $state) => Estado::from($state)->getColor()),
 
-  TextColumn::make('nombre')
-            ->label('Nombre')
-            ->searchable()
-            ->sortable(),
+                TextColumn::make('eps')
+                    ->label('EPS')
+                    ->searchable()
+                    ->sortable(),
 
-       TextColumn::make('fecha_ingreso')
-            ->label('Fecha Ingreso')
-            ->date()
-            ->sortable(),
+                TextColumn::make('ingreso')
+                    ->label('Ingreso')
+                    ->money('COP', true)
+                    ->sortable(),
 
- FBadgeColumn::make('estado')
-    ->label('Estado')
-    ->formatStateUsing(fn (string $state) => Estado::from($state)->label())
-    ->color(fn (string $state) => Estado::from($state)->getColor())
-    ->formatStateUsing(function ($state) {
-        try {
-            return Estado::from($state)->label();
-        } catch (\ValueError $e) {
-            return $state;
-        }
-    }),
+                TextColumn::make('Tipo_documento')
+                    ->label('Tipo Documento')
+                    ->searchable()
+                    ->sortable(),
 
+                TextColumn::make('tip_procedimiento')
+                    ->label('Tipo Procedimiento')
+                    ->searchable()
+                    ->sortable(),
 
+                TextColumn::make('codigo_procedimiento')
+                    ->label('Código Procedimiento')
+                    ->searchable()
+                    ->sortable(),
 
-    TextColumn::make('eps')
-            ->label('EPS')
-            ->searchable()
-            ->sortable(),
+                TextColumn::make('cantidad')
+                    ->label('Cantidad')
+                    ->sortable(),
 
-        TextColumn::make('ingreso')
-            ->label('Ingreso')
-            ->money('COP', true)
-            ->sortable(),
+                TextColumn::make('valor_unitario')
+                    ->label('Valor Unitario')
+                    ->money('COP', true)
+                    ->sortable(),
 
-     
+                TextColumn::make('valor_total')
+                    ->label('Valor Total')
+                    ->money('COP', true)
+                    ->sortable(),
 
- 
-        TextColumn::make('Tipo_documento')
-            ->label('Tipo Documento')
-            ->searchable()
-            ->sortable(),
+                TextColumn::make('convenio')
+                    ->label('Convenio')
+                    ->searchable()
+                    ->sortable(),
 
-        TextColumn::make('tip_procedimiento')
-            ->label('Tipo Procedimiento')
-            ->searchable()
-            ->sortable(),
+                TextColumn::make('nit')
+                    ->label('NIT')
+                    ->searchable()
+                    ->sortable(),
 
-        TextColumn::make('codigo_procedimiento')
-            ->label('Código Procedimiento')
-            ->searchable()
-            ->sortable(),
+                TextColumn::make('diagnostico')
+                    ->label('Diagnóstico')
+                    ->searchable()
+                    ->sortable(),
 
-      
-    
-
-
-
-        TextColumn::make('cantidad')
-            ->label('Cantidad')
-            ->sortable(),
-
-        TextColumn::make('valor_unitario')
-            ->label('Valor Unitario')
-            ->money('COP', true)
-            ->sortable(),
-
-        TextColumn::make('valor_total')
-            ->label('Valor Total')
-            ->money('COP', true)
-            ->sortable(),
-
-        TextColumn::make('convenio')
-            ->label('Convenio')
-            ->searchable()
-            ->sortable(),
-
-        TextColumn::make('nit')
-            ->label('NIT')
-            ->searchable()
-            ->sortable(),
-
-    
-        TextColumn::make('diagnostico')
-            ->label('Diagnóstico')
-            ->searchable()
-            ->sortable(),
-
-        TextColumn::make('servicio')
-            ->label('Servicio')
-            ->searchable()
-            ->sortable(),
-
-
+                TextColumn::make('servicio')
+                    ->label('Servicio')
+                    ->searchable()
+                    ->sortable(),
             ])
-
             ->filters([
-Tables\Filters\Filter::make('dcto')
-    ->form([
-        \Filament\Forms\Components\TextInput::make('dcto')
-            ->label('Documento')
-            ->placeholder('Buscar por documento'),
-    ])
-    ->query(function ($query, array $data) {
-        return $query->when(
-            $data['dcto'],
-            fn ($q, $dcto) => $q->where('dcto', $dcto) // 👈 búsqueda exacta, usa el índice
-        );
-    }),
+                Filter::make('dcto')
+                    ->form([
+                        FTextInput::make('dcto')
+                            ->label('Documento')
+                            ->placeholder('Buscar por documento'),
+                    ])
+                    ->query(function ($query, array $data) {
+                        return $query->when($data['dcto'], fn ($q, $dcto) => $q->where('dcto', $dcto));
+                    }),
 
-
-   Tables\Filters\Filter::make('eps')
-    ->form([
-        \Filament\Forms\Components\TextInput::make('eps')
-            ->label('EPS')
-            ->placeholder('Buscar por EPS'),
-    ])
-    ->query(function ($query, array $data) {
-        return $query->when(
-            $data['eps'],
-            fn ($q, $eps) => $q->whereRaw(
-                "MATCH (eps) AGAINST (? IN BOOLEAN MODE)",
-                [$eps . '*'] // prefijo, busca "salud*" → "salud total", "salud sanitas"
-            )
-        );
-    }),
-
-
-
-])
-->filtersLayout(\Filament\Tables\Enums\FiltersLayout::AboveContent) // 👈 esto hace que se muestren arriba
-
-
-
+                Filter::make('eps')
+                    ->form([
+                        FTextInput::make('eps')
+                            ->label('EPS')
+                            ->placeholder('Buscar por EPS'),
+                    ])
+                    ->query(function ($query, array $data) {
+                        return $query->when(
+                            $data['eps'],
+                            fn ($q, $eps) => $q->whereRaw(
+                                "MATCH (eps) AGAINST (? IN BOOLEAN MODE)",
+                                [$eps . '*']
+                            )
+                        );
+                    }),
+            ])
+            ->filtersLayout(FiltersLayout::AboveContent)
             ->actions([
-                Tables\Actions\EditAction::make(),
+                //Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+      BulkAction::make('redirectSelected')
+        ->label('Ir a Radicar')
+        ->modalSubheading('¿Estás seguro que deseas hacer esto?') 
+        ->icon('heroicon-o-arrow-right-circle')
+        ->action(function (Collection $records) {
+            // Usar id_facturado en lugar de id
+            $ids = $records->pluck('id_facturado')->toArray();
+
+            $url = \App\Filament\Resources\RadicadoResource::getUrl('create') 
+                   . '?facturado_ids=' . implode(',', $ids);
+
+            return redirect($url);
+        })
+        ->deselectRecordsAfterCompletion()
+        ->requiresConfirmation(),
             ]);
     }
 
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 
     public static function getPages(): array
@@ -239,5 +230,10 @@ Tables\Filters\Filter::make('dcto')
             'edit' => Pages\EditFacturado::route('/{record}/edit'),
         ];
     }
+    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+{
+    return parent::getEloquentQuery()
+        ->where('estado', 'facturado'); // 👈 aquí aplicas el filtro permanente
 }
 
+}

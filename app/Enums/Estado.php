@@ -39,7 +39,7 @@ enum Estado: string
          self::FACTURADO => 'success',       // Verde: proceso completado correctamente
          self::INGRESO_ABIERTO => 'warning', // Amarillo: algo en curso, aún no cerrado
          self::PACIENTE_ACOSTADO => 'info',  // Azul: estado informativo/neutral
-         self::RADICADO => 'primary',        // Azul oscuro (o similar): documento oficializado
+         self::RADICADO => 'info',        // Azul oscuro (o similar): documento oficializado
 
          
         };
