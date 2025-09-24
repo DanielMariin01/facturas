@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Ingreso_abierto extends Model
+class PacienteAcostado extends Model
 {
     protected $table = 'facturado'; // Nombre de la tabla
     protected $primaryKey = 'id_facturado';

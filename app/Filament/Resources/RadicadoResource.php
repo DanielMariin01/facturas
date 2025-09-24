@@ -17,6 +17,9 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Tables\Filters\Filter;
 use Filament\Forms\Components\TextInput as FTextInput;
 use Filament\Tables\Enums\FiltersLayout;
+use Illuminate\Database\Eloquent\Model;
+
+
 
 class RadicadoResource extends Resource
 {
@@ -32,8 +35,9 @@ class RadicadoResource extends Resource
     {
         return 'warning'; // Cambiado a 'warning' para el color naranja
     }
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+   protected static ?string $navigationIcon = 'heroicon-o-inbox';
 
+protected static ?int $navigationSort = 4;
     public static function form(Form $form): Form
     {
         return $form
@@ -106,6 +110,18 @@ class RadicadoResource extends Resource
 
                 
             ])
+
+
+    ->headerActions([
+         Tables\Actions\CreateAction::make()
+                ->visible(false),
+        ])
+
+
+
+
+
+
             ->filters([
                    Filter::make('codigo')
                     ->form([
@@ -139,7 +155,7 @@ class RadicadoResource extends Resource
         return [
             'index' => Pages\ListRadicados::route('/'),
             'create' => Pages\CreateRadicado::route('/create'),
-            'edit' => Pages\EditRadicado::route('/{record}/edit'),
+            //'edit' => Pages\EditRadicado::route('/{record}/edit'),
         ];
     }
    
@@ -151,6 +167,12 @@ class RadicadoResource extends Resource
             $query->where('estado', 'radicado');
         });
 }
+
+public static function canEdit(Model $record): bool
+{
+    return false;
+}
+
 
 
 }

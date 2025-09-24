@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\IngresoAbiertoResource\Pages;
-use App\Filament\Resources\IngresoAbiertoResource\RelationManagers;
-use App\Models\Ingreso_abierto;
+use App\Filament\Resources\PacienteAcostadoResource\Pages;
+use App\Filament\Resources\PacienteAcostadoResource\RelationManagers;
+use App\Models\PacienteAcostado;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -22,14 +22,17 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 
-class IngresoAbiertoResource extends Resource
-{
-    protected static ?string $model = Ingreso_abierto::class;
 
-  protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-list';
-protected static ?string $modelLabel = 'Ingreso Abierto ';
-    protected static ?string $navigationLabel = 'Ingreso Abierto';
-    protected static ?int $navigationSort = 1;
+class PacienteAcostadoResource extends Resource
+{
+    protected static ?string $model = PacienteAcostado::class;
+
+ protected static ?string $navigationIcon = 'heroicon-o-user';
+protected static ?string $modelLabel = 'Pacientes Acostados';
+protected static ?int $navigationSort = 3;
+
+        protected static ?string $navigationLabel = 'Paciente Acostado';
+
     
     public static function canCreate(): bool
     {
@@ -45,10 +48,8 @@ protected static ?string $modelLabel = 'Ingreso Abierto ';
     {
         return 'warning';
     }
-public static function canEdit(Model $record): bool
-{
-    return false;
-}
+
+
     public static function form(Form $form): Form
     {
         return $form
@@ -61,10 +62,10 @@ public static function canEdit(Model $record): bool
     {
         return $table
             ->columns([
-                 FBadgeColumn::make('dias_facturado')
-                    ->label('Días Ingreso abierto')
+                FBadgeColumn::make('dias_facturado')
+                    ->label('Días Paciente acostado')
                     ->getStateUsing(function ($record) {
-                        if ($record->estado !== 'ingreso_abierto') {
+                        if ($record->estado !== 'paciente_acostado') {
                             return null;
                         }
                         $fechaIngreso = Carbon::parse($record->fecha_ingreso);
@@ -199,7 +200,7 @@ public static function canEdit(Model $record): bool
                         );
                     }),
             ])
-               ->filtersLayout(FiltersLayout::AboveContent)
+                       ->filtersLayout(FiltersLayout::AboveContent)
             ->actions([
                 Tables\Actions\EditAction::make(),
             ])
@@ -220,15 +221,20 @@ public static function canEdit(Model $record): bool
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListIngresoAbiertos::route('/'),
-            'create' => Pages\CreateIngresoAbierto::route('/create'),
-            'edit' => Pages\EditIngresoAbierto::route('/{record}/edit'),
+            'index' => Pages\ListPacienteAcostados::route('/'),
+            'create' => Pages\CreatePacienteAcostado::route('/create'),
+            'edit' => Pages\EditPacienteAcostado::route('/{record}/edit'),
         ];
     }
 
-        public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+            public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
 {
     return parent::getEloquentQuery()
-        ->where('estado', 'ingreso_abierto'); // 👈 aquí aplicas el filtro permanente
+        ->where('estado', 'paciente_acostado'); // 👈 aquí aplicas el filtro permanente
+}
+
+public static function canEdit(Model $record): bool
+{
+    return false;
 }
 }

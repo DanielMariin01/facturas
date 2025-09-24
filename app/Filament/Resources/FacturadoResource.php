@@ -25,11 +25,15 @@ use Filament\Tables\Actions\BulkAction;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Redirect;
 use Filament\Facades\Filament;
+use Illuminate\Database\Eloquent\Model;
+
+
 
 class FacturadoResource extends Resource
 {
     protected static ?string $model = Facturado::class;
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+  protected static ?string $navigationIcon = 'heroicon-o-document-currency-dollar';
+protected static ?int $navigationSort = 2;
 
     public static function canCreate(): bool
     {
@@ -45,7 +49,10 @@ class FacturadoResource extends Resource
     {
         return 'warning';
     }
-
+public static function canEdit(Model $record): bool
+{
+    return false;
+}
     public static function form(Form $form): Form
     {
         return $form
