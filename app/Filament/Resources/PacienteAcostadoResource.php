@@ -96,6 +96,9 @@ protected static ?int $navigationSort = 3;
                 TextColumn::make('nombre')
                     ->label('Nombre')
                     ->searchable()
+                    ->wrap()
+                    ->tooltip(fn ($state) => $state)
+                    ->lineClamp(2)
                     ->sortable(),
 
                 TextColumn::make('fecha_ingreso')
@@ -121,7 +124,7 @@ protected static ?int $navigationSort = 3;
 
                 TextColumn::make('ingreso')
                     ->label('Ingreso')
-                    ->money('COP', true)
+             
                     ->sortable(),
 
                 TextColumn::make('Tipo_documento')
@@ -145,12 +148,12 @@ protected static ?int $navigationSort = 3;
 
                 TextColumn::make('valor_unitario')
                     ->label('Valor Unitario')
-                    ->money('COP', true)
+                    ->formatStateUsing(fn ($state) => number_format($state, 0, ',', '.'))
                     ->sortable(),
 
                 TextColumn::make('valor_total')
                     ->label('Valor Total')
-                    ->money('COP', true)
+                    ->formatStateUsing(fn ($state) => number_format($state, 0, ',', '.'))
                     ->sortable(),
 
                 TextColumn::make('convenio')
@@ -173,6 +176,9 @@ protected static ?int $navigationSort = 3;
                     ->searchable()
                     ->sortable(),
             ])
+                 ->defaultPaginationPageOption(10) // 👈 Máximo 10 registros por página
+        ->paginated([5,10, 25])
+
             ->filters([
                 Filter::make('dcto')
                     ->form([

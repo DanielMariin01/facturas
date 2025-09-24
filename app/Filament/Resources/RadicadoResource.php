@@ -69,47 +69,62 @@ protected static ?int $navigationSort = 4;
 
         // Nombres facturados (múltiples registros)
         Tables\Columns\TextColumn::make('facturado.nombre')
-            ->label('Nombres Facturados')
+            ->label('Nombre')
             ->listWithLineBreaks()
-            ->limitList(3)   // 👈 solo muestra 3, expande si hay más
+            ->limitList(5) 
+             // 👈 solo muestra 3, expande si hay más
             ->expandableLimitedList(),
 
         // Tipo Documento de cada facturado
         Tables\Columns\TextColumn::make('facturado.T_Dcto')
             ->label('Tipo Documento')
-            ->listWithLineBreaks(),
+       ->listWithLineBreaks()
+            ->limitList(5)   // 👈 solo muestra 3, expande si hay más
+            ->expandableLimitedList(),
 
         // Documento de cada facturado
         Tables\Columns\TextColumn::make('facturado.dcto')
             ->label('Documento')
-            ->listWithLineBreaks(),
+            ->listWithLineBreaks()
+            ->limitList(5)   // 👈 solo muestra 3, expande si hay más
+            ->expandableLimitedList(),
 
         // Estado con Badge
         Tables\Columns\BadgeColumn::make('facturado.estado')
             ->label('Estado')
             ->formatStateUsing(fn ($state) => \App\Enums\Estado::tryFrom($state)?->label() ?? $state)
             ->color(fn ($state) => \App\Enums\Estado::tryFrom($state)?->getColor() ?? 'gray')
-            ->listWithLineBreaks(),
+        ->listWithLineBreaks()
+            ->limitList(5)   // 👈 solo muestra 3, expande si hay más
+            ->expandableLimitedList(),
+        
 
         // EPS
         Tables\Columns\TextColumn::make('facturado.eps')
             ->label('EPS')
-            ->listWithLineBreaks(),
+             ->listWithLineBreaks()
+            ->limitList(5)   // 👈 solo muestra 3, expande si hay más
+            ->expandableLimitedList(),
 
         // Ingreso
         Tables\Columns\TextColumn::make('facturado.ingreso')
             ->label('Ingreso')
-            ->money('COP', true)
-            ->listWithLineBreaks(),
+           ->listWithLineBreaks()
+            ->limitList(5)   // 👈 solo muestra 3, expande si hay más
+            ->expandableLimitedList(),
 
         // Fecha de ingreso
         Tables\Columns\TextColumn::make('facturado.fecha_ingreso')
             ->label('Fecha Ingreso')
             ->date()
-            ->listWithLineBreaks(),
+            ->listWithLineBreaks()
+            ->limitList(5)   // 👈 solo muestra 3, expande si hay más
+            ->expandableLimitedList(),
 
                 
             ])
+             ->defaultPaginationPageOption(10) // 👈 Máximo 10 registros por página
+        ->paginated([5,10, 25])
 
 
     ->headerActions([
