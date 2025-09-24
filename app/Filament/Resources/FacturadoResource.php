@@ -122,6 +122,21 @@ public static function canEdit(Model $record): bool
                     ->label('EPS')
                     ->searchable()
                     ->sortable(),
+                
+                    TextColumn::make('cantidad')
+                    ->label('Cantidad')
+                    ->sortable(),
+
+                TextColumn::make('valor_unitario')
+                    ->label('Valor Unitario')
+             ->formatStateUsing(fn ($state) => number_format($state, 0, ',', '.'))
+                    ->sortable(),
+
+                
+                TextColumn::make('valor_total')
+                ->label('Valor Total')
+                ->formatStateUsing(fn ($state) => number_format($state, 0, ',', '.'))
+                    ->sortable(),
 
                 TextColumn::make('ingreso')
                     ->label('Ingreso')
@@ -142,19 +157,8 @@ public static function canEdit(Model $record): bool
                     ->searchable()
                     ->sortable(),
 
-                TextColumn::make('cantidad')
-                    ->label('Cantidad')
-                    ->sortable(),
-
-                TextColumn::make('valor_unitario')
-                    ->label('Valor Unitario')
-             ->formatStateUsing(fn ($state) => number_format($state, 0, ',', '.'))
-                    ->sortable(),
-
-                TextColumn::make('valor_total')
-                    ->label('Valor Total')
-                ->formatStateUsing(fn ($state) => number_format($state, 0, ',', '.'))
-                    ->sortable(),
+            
+           
 
                 TextColumn::make('convenio')
                     ->label('Convenio')
