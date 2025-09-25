@@ -55,7 +55,7 @@ class AdminPanelProvider extends PanelProvider
             ->widgets([
                 //Widgets\AccountWidget::class,
                   \App\Filament\Widgets\ValorTotalPieChart::class,  
-             
+                  \App\Filament\Widgets\TotalesPorMesWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,
