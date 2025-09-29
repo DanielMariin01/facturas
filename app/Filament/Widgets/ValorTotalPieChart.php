@@ -15,21 +15,22 @@ class ValorTotalPieChart extends ChartWidget
         $data = Facturado::selectRaw('estado, SUM(valor_total) as total')
             ->groupBy('estado')
             ->get();
-
+        
+               $colores = [
+            'facturado'   => '#17cfb1ff', // verde
+            'radicado'   => '#076affff', // azul
+            'ingreso_abierto'     => '#e70d0dff', // rojo
+            'paciente_acostado'  => '#f4e136ff', // amarillo
+        ];
+  $backgroundColors = $data->pluck('estado')->map(function ($estado) use ($colores) {
+            return $colores[$estado] ?? '#999999'; // gris si no está definido
+        });
         return [
             'datasets' => [
                 [
                     'label' => 'Total por Estado',
                     'data' => $data->pluck('total'),
-                    'backgroundColor' => [
-                    
-                        '#2196F3',
-                        '#FFC107',
-                        '#F44336',
-                        '#9C27B0',
-                        '#00BCD4',
-                        '#FF5722',
-                    ],
+                  'backgroundColor' => $backgroundColors,
                 ],
             ],
             'labels' => $data->pluck('estado'),

@@ -47,7 +47,7 @@ protected static ?int $navigationSort = 2;
 
     public static function getNavigationBadgeColor(): ?string
     {
-        return 'warning';
+        return 'primary';
     }
 public static function canEdit(Model $record): bool
 {

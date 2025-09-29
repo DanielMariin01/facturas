@@ -33,7 +33,7 @@ class RadicadoResource extends Resource
     // Color del contador: NARANJA
     public static function getNavigationBadgeColor(): ?string
     {
-        return 'warning'; // Cambiado a 'warning' para el color naranja
+        return 'primary'; // Cambiado a 'warning' para el color naranja
     }
    protected static ?string $navigationIcon = 'heroicon-o-inbox';
 

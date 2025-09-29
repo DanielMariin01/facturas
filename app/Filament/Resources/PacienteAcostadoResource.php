@@ -46,7 +46,7 @@ protected static ?int $navigationSort = 3;
 
     public static function getNavigationBadgeColor(): ?string
     {
-        return 'warning';
+        return 'primary';
     }
 
 

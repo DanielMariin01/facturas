@@ -43,7 +43,7 @@ protected static ?string $modelLabel = 'Ingreso Abierto ';
 
     public static function getNavigationBadgeColor(): ?string
     {
-        return 'warning';
+        return 'primary';
     }
 public static function canEdit(Model $record): bool
 {
