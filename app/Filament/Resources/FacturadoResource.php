@@ -66,10 +66,10 @@ public static function canEdit(Model $record): bool
                 FBadgeColumn::make('dias_facturado')
                     ->label('Días facturado')
                     ->getStateUsing(function ($record) {
-                        if ($record->estado !== 'facturado') {
+                        if ($record->Estado !== 'Facturado') {
                             return null;
                         }
-                        $fechaIngreso = Carbon::parse($record->fecha_ingreso);
+                        $fechaIngreso = Carbon::parse($record->Fec_Ingreso);
                         $dias = $fechaIngreso->diffInHours(Carbon::now()) / 24;
                         return (int) ceil($dias);
                     })
@@ -84,30 +84,16 @@ public static function canEdit(Model $record): bool
                         return 'danger';
                     }),
 
-                TextColumn::make('T_Dcto')
-                    ->label('Tipo Documento')
-                    ->searchable()
-                    ->sortable(),
+           Tables\Columns\TextColumn::make('Dcto')->sortable()->searchable()->label('Documento'),
+                //Tables\Columns\TextColumn::make('Tipo')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('T_Dcto')->sortable()->searchable()->label('Tipo Documento'),
+                Tables\Columns\TextColumn::make('Paciente')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('EPS')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('Ingreso')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('Fec_Ingreso')->date()->sortable(),
+                Tables\Columns\TextColumn::make('Fec_Egreso')->date()->sortable(),
 
-                TextColumn::make('dcto')
-                    ->label('Documento')
-                    ->searchable()
-                    ->sortable(),
-
-                TextColumn::make('nombre')
-                    ->label('Nombre')
-                    ->searchable()
-                        ->wrap()
-                          ->tooltip(fn ($state) => $state)
-                ->lineClamp(2)
-                    ->sortable(),
-
-                TextColumn::make('fecha_ingreso')
-                    ->label('Fecha Ingreso')
-                    ->date()
-                    ->sortable(),
-
-                FBadgeColumn::make('estado')
+                FBadgeColumn::make('Estado')
                     ->label('Estado')
                     ->formatStateUsing(function ($state) {
                         try {
@@ -118,91 +104,73 @@ public static function canEdit(Model $record): bool
                     })
                     ->color(fn (string $state) => Estado::from($state)->getColor()),
 
-                TextColumn::make('eps')
-                    ->label('EPS')
-                    ->searchable()
-                    ->sortable(),
-                
-                    TextColumn::make('cantidad')
-                    ->label('Cantidad')
-                    ->sortable(),
+                Tables\Columns\TextColumn::make('Vl_Unit') ->label('Valor Unitario')  ->formatStateUsing(fn ($state) => number_format($state, 0, ',', '.') ),
+                Tables\Columns\TextColumn::make('Vl_Total') ->label('Valor Total')  ->formatStateUsing(fn ($state) => number_format($state, 0, ',', '.') ),
+                Tables\Columns\TextColumn::make('Codi_Proc')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('Nombre')->searchable()->searchable(),
+                 Tables\Columns\TextColumn::make('Cod_Med'),
+                Tables\Columns\TextColumn::make('Medico')->searchable(),
+                 Tables\Columns\TextColumn::make('Factura')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('Tipo_Documento')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('Fecha_Factura')->date()->sortable(),
+                Tables\Columns\TextColumn::make('Fecha')->date()->sortable(),
+                Tables\Columns\TextColumn::make('Grup_Cir')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('Cod_Proced')->sortable()->searchable(),
+                 Tables\Columns\TextColumn::make('UVR'),
+                Tables\Columns\TextColumn::make('Porcentaje'),
+                Tables\Columns\TextColumn::make('Cant'),
+                 Tables\Columns\TextColumn::make('Tipo_Cargo'),
+                Tables\Columns\TextColumn::make('Cod_CC'),
+                Tables\Columns\TextColumn::make('Ce_Cos'),
+                Tables\Columns\TextColumn::make('Id_Honor'),
+                Tables\Columns\TextColumn::make('Honor'),
+                Tables\Columns\TextColumn::make('Especialidad'),
+                Tables\Columns\TextColumn::make('Convenio_Id'),
+                Tables\Columns\TextColumn::make('Convenio'),
+                Tables\Columns\TextColumn::make('NIT'),
+                 Tables\Columns\TextColumn::make('CodDx'),
+                Tables\Columns\TextColumn::make('Diagnostico'),
+                Tables\Columns\TextColumn::make('Anato'),
+                Tables\Columns\TextColumn::make('PART'),
+                Tables\Columns\TextColumn::make('SERVICIO'),
+                Tables\Columns\TextColumn::make('Codigo_CUM'),
+                Tables\Columns\TextColumn::make('Registro_INVIMA'),
+                Tables\Columns\TextColumn::make('Numero_Cita'),
+                Tables\Columns\TextColumn::make('Mes_Ingreso'),
+                Tables\Columns\TextColumn::make('Año_ingreso'),
+                Tables\Columns\TextColumn::make('agrupador'),
+                Tables\Columns\TextColumn::make('Mes_Egreso'),
+                 Tables\Columns\TextColumn::make('created_at')->dateTime()->sortable()->label('Creado el' ),
+                Tables\Columns\TextColumn::make('updated_at')->dateTime()->sortable()->label('actualizado el' ),
 
-                TextColumn::make('valor_unitario')
-                    ->label('Valor Unitario')
-             ->formatStateUsing(fn ($state) => number_format($state, 0, ',', '.'))
-                    ->sortable(),
-
-                
-                TextColumn::make('valor_total')
-                ->label('Valor Total')
-                ->formatStateUsing(fn ($state) => number_format($state, 0, ',', '.'))
-                    ->sortable(),
-
-                TextColumn::make('ingreso')
-                    ->label('Ingreso')
-                    ->sortable(),
-
-                TextColumn::make('Tipo_documento')
-                    ->label('Tipo Documento')
-                    ->searchable()
-                    ->sortable(),
-
-                TextColumn::make('tip_procedimiento')
-                    ->label('Tipo Procedimiento')
-                    ->searchable()
-                    ->sortable(),
-
-                TextColumn::make('codigo_procedimiento')
-                    ->label('Código Procedimiento')
-                    ->searchable()
-                    ->sortable(),
-
-            
-           
-
-                TextColumn::make('convenio')
-                    ->label('Convenio')
-                    ->searchable()
-                    ->sortable(),
-
-                TextColumn::make('nit')
-                    ->label('NIT')
-                    ->searchable()
-                    ->sortable(),
-
-                TextColumn::make('diagnostico')
-                    ->label('Diagnóstico')
-                    ->searchable()
-                    ->sortable(),
-
-                TextColumn::make('servicio')
-                    ->label('Servicio')
-                    ->searchable()
-                    ->sortable(),
+              
             ])
                  ->defaultPaginationPageOption(10) // 👈 Máximo 10 registros por página
         ->paginated([5, 10, 25])
 
             ->filters([
-                Filter::make('dcto')
-                    ->form([
-                        FTextInput::make('dcto')
-                            ->label('Documento')
-                            ->placeholder('Buscar por documento'),
-                    ])
-                    ->query(function ($query, array $data) {
-                        return $query->when($data['dcto'], fn ($q, $dcto) => $q->where('dcto', $dcto));
-                    }),
+                Filter::make('Dcto')
+    ->form([
+        FTextInput::make('Dcto')
+            ->label('Documento')
+            ->placeholder('Buscar por documento'),
+    ])
+    ->query(function ($query, array $data) {
+        return $query->when(
+            $data['Dcto'] ?? null,
+            fn ($q, $dcto) => $q->where('Dcto', $dcto)
+        );
+    }),
 
-                Filter::make('eps')
+                Filter::make('EPS')
                     ->form([
-                        FTextInput::make('eps')
+                        FTextInput::make('EPS')
                             ->label('EPS')
                             ->placeholder('Buscar por EPS'),
                     ])
                     ->query(function ($query, array $data) {
                         return $query->when(
-                            $data['eps'],
+                            $data['EPS'],
                             fn ($q, $eps) => $q->whereRaw(
                                 "MATCH (eps) AGAINST (? IN BOOLEAN MODE)",
                                 [$eps . '*']

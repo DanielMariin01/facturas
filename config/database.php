@@ -98,22 +98,34 @@ return [
         ],
 
         'sqlsrv' => [
-            'driver' => 'sqlsrv',
-            'url' => env('DB_URL'),
-            'host' => env('DB_HOST', 'localhost'),
-            'port' => env('DB_PORT', '1433'),
-            'database' => env('DB_DATABASE', 'laravel'),
-            'username' => env('DB_USERNAME', 'root'),
-            'password' => env('DB_PASSWORD', ''),
-            'charset' => env('DB_CHARSET', 'utf8'),
-            'prefix' => '',
-            'prefix_indexes' => true,
-            'encrypt' => env('DB_ENCRYPT', 'no'),
-            'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'true'),
+    'driver' => 'sqlsrv',
+    'host' => env('DB_SQLSRV_HOST', 'localhost'),
+    'port' => env('DB_SQLSRV_PORT', '1433'),
+    'database' => env('DB_SQLSRV_DATABASE', 'forge'),
+    'username' => env('DB_SQLSRV_USERNAME', 'forge'),
+    'password' => env('DB_SQLSRV_PASSWORD', ''),
+    'encrypt' => env('DB_SQLSRV_ENCRYPT', 'no'),
+    'trust_server_certificate' => env('DB_SQLSRV_TRUST_SERVER_CERTIFICATE', true),
+         
+],
+
+        //'sqlsrv' => [
+            //'driver' => 'sqlsrv',
+            //'url' => env('DB_URL'),
+            //'host' => env('DB_HOST', 'localhost'),
+            //'port' => env('DB_PORT', '1433'),
+            //'database' => env('DB_DATABASE', 'laravel'),
+            //'username' => env('DB_USERNAME', 'root'),
+            //'password' => env('DB_PASSWORD', ''),
+            //'charset' => env('DB_CHARSET', 'utf8'),
+            //'prefix' => '',
+            //'prefix_indexes' => true,
+            //'encrypt' => env('DB_ENCRYPT', 'no'),
+            //'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'true'),
         //'TrustServerCertificate' => true, // Solo en desarrollo
         // En producción con Azure, usa: 'Encrypt' => true
 
-        ],
+   
 
     ],
 

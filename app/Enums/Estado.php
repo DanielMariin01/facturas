@@ -4,10 +4,10 @@ namespace App\Enums;
 
 enum Estado: string
 {
-    case FACTURADO = 'facturado';
-    case INGRESO_ABIERTO = 'ingreso_abierto';
-    case PACIENTE_ACOSTADO= 'paciente_acostado';
-    case RADICADO= 'radicado';
+    case FACTURADO = 'Facturado';
+    case INGRESO_ABIERTO = 'Ingreso_abierto';
+    case PACIENTE_ACOSTADO= 'Paciente_acostado';
+    case RADICADO= 'Radicado';
    
  
 
