@@ -46,11 +46,11 @@ protected static ?int $navigationSort = 4;
                 ->label('Codigo'),
 
             // Campo para subir archivos
-            FileUpload::make('archivo_xml')
-                ->label('Archivo XML')
-                ->acceptedFileTypes(['application/xml', 'text/xml','application/pdf']) // <-- Restringe a archivos XML
-                ->required() // Hace que el campo sea obligatorio
-                ->storeFileNamesIn('nombre_archivo'),
+        FileUpload::make('archivo')
+    ->label('Archivo TXT')
+    ->acceptedFileTypes(['text/plain']) // Solo archivos .txt
+    ->required() // Campo obligatorio
+    ->storeFileNamesIn('nombre_archivo')
             ]);
     }
 
@@ -67,29 +67,7 @@ protected static ?int $navigationSort = 4;
             ->label('Código Radicado')
             ->searchable(),
 
-        // Nombres facturados (múltiples registros)
-        Tables\Columns\TextColumn::make('facturado.nombre')
-            ->label('Nombre')
-            ->listWithLineBreaks()
-            ->limitList(5) 
-             // 👈 solo muestra 3, expande si hay más
-            ->expandableLimitedList(),
-
-        // Tipo Documento de cada facturado
-        Tables\Columns\TextColumn::make('facturado.T_Dcto')
-            ->label('Tipo Documento')
-       ->listWithLineBreaks()
-            ->limitList(5)   // 👈 solo muestra 3, expande si hay más
-            ->expandableLimitedList(),
-
-        // Documento de cada facturado
-        Tables\Columns\TextColumn::make('facturado.dcto')
-            ->label('Documento')
-            ->listWithLineBreaks()
-            ->limitList(5)   // 👈 solo muestra 3, expande si hay más
-            ->expandableLimitedList(),
-
-        // Estado con Badge
+     
         Tables\Columns\BadgeColumn::make('facturado.estado')
             ->label('Estado')
             ->formatStateUsing(fn ($state) => \App\Enums\Estado::tryFrom($state)?->label() ?? $state)
@@ -99,29 +77,52 @@ protected static ?int $navigationSort = 4;
             ->expandableLimitedList(),
         
 
-        // EPS
-        Tables\Columns\TextColumn::make('facturado.eps')
-            ->label('EPS')
-             ->listWithLineBreaks()
-            ->limitList(5)   // 👈 solo muestra 3, expande si hay más
-            ->expandableLimitedList(),
-
-        // Ingreso
-        Tables\Columns\TextColumn::make('facturado.ingreso')
-            ->label('Ingreso')
-           ->listWithLineBreaks()
-            ->limitList(5)   // 👈 solo muestra 3, expande si hay más
-            ->expandableLimitedList(),
-
-        // Fecha de ingreso
-        Tables\Columns\TextColumn::make('facturado.fecha_ingreso')
-            ->label('Fecha Ingreso')
-            ->date()
-            ->listWithLineBreaks()
-            ->limitList(5)   // 👈 solo muestra 3, expande si hay más
-            ->expandableLimitedList(),
-
-                
+           Tables\Columns\TextColumn::make('facturado.Dcto')->sortable()->searchable()->label('Documento'),
+                //Tables\Columns\TextColumn::make('Tipo')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('facturado.T_Dcto')->sortable()->searchable()->label('Tipo Documento'),
+                Tables\Columns\TextColumn::make('facturado.Paciente')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('facturado.EPS')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('facturado.Ingreso')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('facturado.Fec_Ingreso')->date()->sortable(),
+                Tables\Columns\TextColumn::make('facturado.Fec_Egreso')->date()->sortable(),
+                 Tables\Columns\TextColumn::make('facturado.Vl_Unit') ->label('Valor Unitario')  ->formatStateUsing(fn ($state) => number_format($state, 0, ',', '.') ),
+                Tables\Columns\TextColumn::make('facturado.Vl_Total') ->label('Valor Total')  ->formatStateUsing(fn ($state) => number_format($state, 0, ',', '.') ),
+                Tables\Columns\TextColumn::make('facturado.Codi_Proc')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('facturado.Nombre')->searchable()->searchable(),
+                 Tables\Columns\TextColumn::make('facturado.Cod_Med'),
+                Tables\Columns\TextColumn::make('facturado.Medico')->searchable(),
+                 Tables\Columns\TextColumn::make('facturado.Factura')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('facturado.Tipo_Documento')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('facturado.Fecha_Factura')->date()->sortable(),
+                Tables\Columns\TextColumn::make('facturado.Fecha')->date()->sortable(),
+                Tables\Columns\TextColumn::make('facturado.Grup_Cir')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('facturado.Cod_Proced')->sortable()->searchable(),
+                 Tables\Columns\TextColumn::make('facturado.UVR'),
+                Tables\Columns\TextColumn::make('facturado.Porcentaje'),
+                Tables\Columns\TextColumn::make('facturado.Cant'),
+                 Tables\Columns\TextColumn::make('facturado.Tipo_Cargo'),
+                Tables\Columns\TextColumn::make('facturado.Cod_CC'),
+                Tables\Columns\TextColumn::make('facturado.Ce_Cos'),
+                Tables\Columns\TextColumn::make('facturado.Id_Honor'),
+                Tables\Columns\TextColumn::make('facturado.Honor'),
+                Tables\Columns\TextColumn::make('facturado.Especialidad'),
+                Tables\Columns\TextColumn::make('facturado.Convenio_Id'),
+                Tables\Columns\TextColumn::make('facturado.Convenio'),
+                Tables\Columns\TextColumn::make('facturado.NIT'),
+                 Tables\Columns\TextColumn::make('facturado.CodDx'),
+                Tables\Columns\TextColumn::make('facturado.Diagnostico'),
+                Tables\Columns\TextColumn::make('facturado.Anato'),
+                Tables\Columns\TextColumn::make('facturado.PART'),
+                Tables\Columns\TextColumn::make('facturado.SERVICIO'),
+                Tables\Columns\TextColumn::make('facturado.Codigo_CUM'),
+                Tables\Columns\TextColumn::make('facturado.Registro_INVIMA'),
+                Tables\Columns\TextColumn::make('facturado.Numero_Cita'),
+                Tables\Columns\TextColumn::make('facturado.Mes_Ingreso'),
+                Tables\Columns\TextColumn::make('facturado.Año_ingreso'),
+                Tables\Columns\TextColumn::make('facturado.agrupador'),
+                Tables\Columns\TextColumn::make('facturado.Mes_Egreso'),
+    
+       
             ])
              ->defaultPaginationPageOption(10) // 👈 Máximo 10 registros por página
         ->paginated([5,10, 25])
@@ -131,10 +132,6 @@ protected static ?int $navigationSort = 4;
          Tables\Actions\CreateAction::make()
                 ->visible(false),
         ])
-
-
-
-
 
 
             ->filters([
