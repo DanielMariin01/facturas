@@ -8,84 +8,69 @@ use Illuminate\Support\Facades\Schema;
 
 class SyncDatos extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'app:sync-datos';
     protected $description = 'Sincroniza datos desde SQL Server remoto hacia MySQL local';
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
 
-
-    /**
-     * Execute the console command.
-     */
     public function handle()
     {
-        //$remotos = DB::connection('sqlsrv')->table('ejecucion')->get();
-
-     DB::connection('mysql')->table('facturado')->delete();
-
-
         $this->info("Iniciando sincronización de datos...");
-DB::connection('sqlsrv')
-    ->table('ejecucion')
-    ->orderBy('Dcto')
-    ->chunk(1000, function ($registros) {
-        // Obtener columnas que existen en MySQL
+
+        // Columnas válidas en MySQL
         $campos_mysql = Schema::connection('mysql')->getColumnListing('facturado');
 
-         $map_estado = [
+        // Mapeo de estados en minúsculas
+        $map_estado = [
+            'facturado' => 'Facturado',
+            'ingreso abierto' => 'Ingreso_abierto',
+            'ingreso abierto - paciente acostado' => 'Paciente_acostado',
+        ];
 
-                'Facturado' => 'Facturado',
-                'Ingreso Abierto' => 'Paciente_abierto',
-                'Ingreso Abierto - Paciente Acostado'        => 'Paciente_acostado',
+        DB::connection('sqlsrv')
+            ->table('ejecucion')
+            ->orderBy('Dcto')
+            ->chunk(2000, function ($registros) use ($campos_mysql, $map_estado) {
+                $batch = [];
 
-             
-            ];
+                foreach ($registros as $dato) {
+                    if (!empty($dato->Dcto)) {
+                        $registro = collect($dato)->only($campos_mysql)->toArray();
 
-        $datos = [];
-    foreach ($registros as $dato) {
-    // Verifica que 'Dcto' no esté vacío o nulo
-    if (!empty($dato->Dcto)) {
+                        // Normalizar estado
+                        if (isset($registro['Estado'])) {
+                            $estadoOriginal = trim($registro['Estado']);
+                            $estadoNormalizado = strtolower(preg_replace('/\s+/', ' ', $estadoOriginal)); 
+                            // 👆 normaliza espacios y minúsculas
 
-        // Inserta solo las columnas que existen en MySQL
-        $registro = collect($dato)->only($campos_mysql)->toArray();
+                            $registro['Estado'] = $map_estado[$estadoNormalizado] ?? $estadoOriginal;
 
-        // Mapeo de Estado
-        if (isset($registro['Estado'])) {
-            $map_estado_lower = [];
-            foreach ($map_estado as $k => $v) {
-                $map_estado_lower[strtolower(trim($k))] = $v;
-            }
-            $estado_lower = strtolower(trim($registro['Estado']));
-            $registro['Estado'] = $map_estado_lower[$estado_lower] ?? 'Paciente_abierto';
-            $registro['Estado'] = substr($registro['Estado'], 0, 50); // ajusta según tamaño de la columna
-        }
+                            if (! isset($map_estado[$estadoNormalizado])) {
+                                logger()->warning("⚠️ Estado no reconocido: {$estadoOriginal}");
+                            }
+                        }
 
-        $datos[] = $registro;
+                        $batch[] = $registro;
+
+                        // Cuando el lote llega a 300 registros → upsert
+                        if (count($batch) >= 300) {
+                            DB::connection('mysql')
+                                ->table('facturado')
+                                ->upsert($batch, ['Dcto']);
+                            $batch = []; // limpiar
+                        }
+                    }
+                }
+
+                // Insertar lo que quedó
+                if (!empty($batch)) {
+                    DB::connection('mysql')
+                        ->table('facturado')
+                        ->upsert($batch, ['Dcto']);
+                }
+
+                unset($batch);
+                gc_collect_cycles();
+            });
+
+        $this->info("Sincronización finalizada ✅");
     }
-}
-
-
-        // Inserta los datos en bloque
-        if (!empty($datos)) {
-            DB::connection('mysql')->table('facturado')->insert($datos);
-        }
-
-        // Liberar memoria
-        unset($datos);
-        gc_collect_cycles();
-    });
-    }
-
-    protected $commands = [
-    \App\Console\Commands\SyncDatos::class,
-];
-
 }

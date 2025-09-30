@@ -12,17 +12,17 @@ class ValorTotalPieChart extends ChartWidget
     protected function getData(): array
     {
         // Agrupar por estado y sumar valor_total
-        $data = Facturado::selectRaw('estado, SUM(valor_total) as total')
-            ->groupBy('estado')
+        $data = Facturado::selectRaw('Estado, SUM(Vl_Total) as total')
+            ->groupBy('Estado')
             ->get();
         
                $colores = [
-            'facturado'   => '#17cfb1ff', // verde
-            'radicado'   => '#076affff', // azul
-            'ingreso_abierto'     => '#e70d0dff', // rojo
-            'paciente_acostado'  => '#f4e136ff', // amarillo
+            'Facturado'   => '#17cfb1ff', // verde
+            'Radicado'   => '#076affff', // azul
+            'Ingreso_abierto'     => '#e70d0dff', // rojo
+            'Paciente_acostado'  => '#f4e136ff', // amarillo
         ];
-  $backgroundColors = $data->pluck('estado')->map(function ($estado) use ($colores) {
+  $backgroundColors = $data->pluck('Estado')->map(function ($estado) use ($colores) {
             return $colores[$estado] ?? '#999999'; // gris si no está definido
         });
         return [
@@ -33,7 +33,7 @@ class ValorTotalPieChart extends ChartWidget
                   'backgroundColor' => $backgroundColors,
                 ],
             ],
-            'labels' => $data->pluck('estado'),
+            'labels' => $data->pluck('Estado'),
         ];
     }
 
