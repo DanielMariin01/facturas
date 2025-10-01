@@ -4,17 +4,24 @@ namespace App\Filament\Widgets;
 
 use App\Models\Facturado; 
 use Filament\Widgets\ChartWidget;
+use Illuminate\Support\Facades\Cache;
+
 
 class ValorTotalPieChart extends ChartWidget
 {
     protected static ?string $heading = 'Valor total por Estado';
+    protected static bool $isLazy = true;
+
 
     protected function getData(): array
     {
         // Agrupar por estado y sumar valor_total
-        $data = Facturado::selectRaw('Estado, SUM(Vl_Total) as total')
-            ->groupBy('Estado')
-            ->get();
+           $data = Cache::remember('valor_total_por_estado', 60, function () {
+            return Facturado::selectRaw('Estado, SUM(Vl_Total) as total')
+                ->groupBy('Estado')
+                ->get();
+        });
+
         
                $colores = [
             'Facturado'   => '#17cfb1ff', // verde

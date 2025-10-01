@@ -61,26 +61,21 @@ public static function canEdit(Model $record): bool
     {
         return $table
             ->columns([
-              FBadgeColumn::make('dias_facturado')
-                    ->label('Días facturado')
-                    ->getStateUsing(function ($record) {
-                        if ($record->Estado !== 'Ingreso_abierto') {
-                            return null;
-                        }
-                        $fechaIngreso = Carbon::parse($record->Fec_Ingreso);
-                        $dias = $fechaIngreso->diffInHours(Carbon::now()) / 24;
-                        return (int) ceil($dias);
-                    })
-                    ->color(function ($state) {
-                        if (is_null($state)) {
-                            return 'gray';
-                        } elseif ($state <= 1) {
-                            return 'success';
-                        } elseif ($state <= 3) {
-                            return 'warning';
-                        }
-                        return 'danger';
-                    }),
+             
+FBadgeColumn::make('dias_ingreso_abierto')
+    ->label('Días Ingreso Abierto')
+    ->getStateUsing(fn($record) => $record->Estado === 'Ingreso_abierto' 
+        ? $record->dias_facturado 
+        : null
+    )
+    ->color(fn($state) => 
+        is_null($state) ? 'gray' : (
+            $state <= 1 ? 'success' : (
+                $state <= 3 ? 'warning' : 'danger'
+            )
+        )
+    )
+    ->sortable(),
 
            Tables\Columns\TextColumn::make('Dcto')->sortable()->searchable()->label('Documento'),
                 //Tables\Columns\TextColumn::make('Tipo')->sortable()->searchable(),
@@ -106,40 +101,41 @@ public static function canEdit(Model $record): bool
                 Tables\Columns\TextColumn::make('Vl_Total') ->label('Valor Total')  ->formatStateUsing(fn ($state) => number_format($state, 0, ',', '.') ),
                 Tables\Columns\TextColumn::make('Codi_Proc')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('Nombre')->searchable()->searchable(),
-                 Tables\Columns\TextColumn::make('Cod_Med'),
-                Tables\Columns\TextColumn::make('Medico')->searchable(),
-                 Tables\Columns\TextColumn::make('Factura')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('Tipo_Documento')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('Fecha_Factura')->date()->sortable(),
+               //  //Tables\Columns\TextColumn::make('Cod_Med'),
+                //Tables\Columns\TextColumn::make('Medico')->searchable(),
+                 //Tables\Columns\TextColumn::make('Factura')->sortable()->searchable(),
+               //Tables\Columns\TextColumn::make('Tipo_Documento')->sortable()->searchable(),
+               // Tables\Columns\TextColumn::make('Fecha_Factura')->date()->sortable(),
                 Tables\Columns\TextColumn::make('Fecha')->date()->sortable(),
-                Tables\Columns\TextColumn::make('Grup_Cir')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('Cod_Proced')->sortable()->searchable(),
-                 Tables\Columns\TextColumn::make('UVR'),
-                Tables\Columns\TextColumn::make('Porcentaje'),
+                //Tables\Columns\TextColumn::make('Grup_Cir')->sortable()->searchable(),
+                //Tables\Columns\TextColumn::make('Cod_Proced')->sortable()->searchable(),
+                 //Tables\Columns\TextColumn::make('UVR'),
+                //Tables\Columns\TextColumn::make('Porcentaje'),
                 Tables\Columns\TextColumn::make('Cant'),
                  Tables\Columns\TextColumn::make('Tipo_Cargo'),
-                Tables\Columns\TextColumn::make('Cod_CC'),
-                Tables\Columns\TextColumn::make('Ce_Cos'),
-                Tables\Columns\TextColumn::make('Id_Honor'),
-                Tables\Columns\TextColumn::make('Honor'),
-                Tables\Columns\TextColumn::make('Especialidad'),
+                //Tables\Columns\TextColumn::make('Cod_CC'),
+               // //Tables\Columns\TextColumn::make('Ce_Cos'),
+                //Tables\Columns\TextColumn::make('Id_Honor'),
+                ////Tables\Columns\TextColumn::make('Honor'),
+                //Tables\Columns\TextColumn::make('Especialidad'),
                 Tables\Columns\TextColumn::make('Convenio_Id'),
                 Tables\Columns\TextColumn::make('Convenio'),
                 Tables\Columns\TextColumn::make('NIT'),
-                 Tables\Columns\TextColumn::make('CodDx'),
+                 //Tables\Columns\TextColumn::make('CodDx'),
                 Tables\Columns\TextColumn::make('Diagnostico'),
-                Tables\Columns\TextColumn::make('Anato'),
-                Tables\Columns\TextColumn::make('PART'),
+                //Tables\Columns\TextColumn::make('Anato'),
+                //Tables\Columns\TextColumn::make('PART'),
                 Tables\Columns\TextColumn::make('SERVICIO'),
-                Tables\Columns\TextColumn::make('Codigo_CUM'),
-                Tables\Columns\TextColumn::make('Registro_INVIMA'),
-                Tables\Columns\TextColumn::make('Numero_Cita'),
+                //Tables\Columns\TextColumn::make('Codigo_CUM'),
+                //Tables\Columns\TextColumn::make('Registro_INVIMA'),
+                //Tables\Columns\TextColumn::make('Numero_Cita'),
                 Tables\Columns\TextColumn::make('Mes_Ingreso'),
-                Tables\Columns\TextColumn::make('Año_ingreso'),
-                Tables\Columns\TextColumn::make('agrupador'),
-                Tables\Columns\TextColumn::make('Mes_Egreso'),
+                //Tables\Columns\TextColumn::make('Año_ingreso'),
+                //Tables\Columns\TextColumn::make('agrupador'),
+                //Tables\Columns\TextColumn::make('Mes_Egreso'),
                  Tables\Columns\TextColumn::make('created_at')->dateTime()->sortable()->label('Creado el' ),
                 Tables\Columns\TextColumn::make('updated_at')->dateTime()->sortable()->label('actualizado el' ),
+
             ])
                  ->defaultPaginationPageOption(10) // 👈 Máximo 10 registros por página
         ->paginated([5,10, 25])
@@ -204,6 +200,7 @@ public static function canEdit(Model $record): bool
         public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
 {
     return parent::getEloquentQuery()
-        ->where('estado', 'ingreso_abierto'); // 👈 aquí aplicas el filtro permanente
+        ->where('estado', 'ingreso_abierto')
+         ->selectRaw('facturado.*, DATEDIFF(NOW(), Fec_Ingreso) as dias_facturado'); // 👈 aquí aplicas el filtro permanente
 }
 }

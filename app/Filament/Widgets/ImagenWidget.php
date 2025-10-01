@@ -7,6 +7,8 @@ use Filament\Widgets\Widget;
 class ImagenWidget extends Widget
 {
     protected static string $view = 'filament.widgets.imagen-widget';
+    protected static bool $isLazy = true;
+
 
     public function getColumnSpan(): int|string|array
 {
