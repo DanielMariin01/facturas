@@ -11,8 +11,24 @@ class ValorTotalPieChart extends ChartWidget
 {
     protected static ?string $heading = 'Valor total por Estado';
     protected static bool $isLazy = true;
+protected int | string | array $columnSpan = '1/3';
 
+   protected static ?string $maxHeight = '250px';
 
+    public static function getColumns(): int | array
+    {
+        return 12; // Ocupar toda la fila
+    }
+
+   protected function getExtraAttributes(): array
+{
+    return [
+        'class' => 'flex justify-center w-full',
+        'style' => 'max-width: 300px; margin: auto;', // lo centra
+    ];
+}
+
+  
     protected function getData(): array
     {
         // Agrupar por estado y sumar valor_total
@@ -48,4 +64,10 @@ class ValorTotalPieChart extends ChartWidget
     {
         return 'doughnut'; // tipo gráfico
     }
+
+    public static function canView(): bool
+{
+    return false;
+}
+
 }

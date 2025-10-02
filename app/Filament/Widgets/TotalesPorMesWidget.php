@@ -3,50 +3,66 @@
 namespace App\Filament\Widgets;
 
 use App\Models\Facturado;
-use Filament\Widgets\TableWidget as BaseWidget;
-use Filament\Tables;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\DB; // <- importante
+use Filament\Widgets\Widget;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Collection;
 
-class TotalesPorMesWidget extends BaseWidget
+class TotalesPorMesWidget extends Widget
 {
-    protected int|string|array $columnSpan = 'full';
-    protected static ?string $heading = 'Totales por mes';
+    protected static ?string $heading = 'Totales por mes (EPS vs Meses)';
+    protected static string $view = 'filament.widgets.totales-por-mes-widget';
+    // En TotalesPorMesWidget.php
+protected int | string | array $columnSpan = 'full';
 
-    public function getTableRecordKey($record): string
+
+    public static function getColumns(): int | array
     {
-        return (string) $record->id_facturado;
+        return 12; // Ocupar toda la fila
     }
 
-    protected function getTableQuery(): Builder
+
+    // La colección que vamos a pasar a la vista
+    public Collection $datosPivot;
+
+    public function mount(): void
     {
-        return Facturado::selectRaw('EPS, YEAR(Fec_Ingreso) as anio, MONTH(Fec_Ingreso) as mes, SUM(Vl_Total) as total')
-            ->groupBy('EPS', DB::raw('YEAR(Fec_Ingreso)'), DB::raw('MONTH(Fec_Ingreso)'))
-            ->orderBy('EPS')
-            ->orderByRaw('YEAR(Fec_Ingreso) ASC')
-            ->orderByRaw('MONTH(Fec_Ingreso) ASC');
-    }
+        // Traemos los datos agrupados
+        $data = Facturado::selectRaw('EPS, MONTH(Fec_Ingreso) as mes, SUM(Vl_Total) as total')
+            ->groupBy('EPS', DB::raw('MONTH(Fec_Ingreso)'))
+            ->get();
 
-    protected function getTableColumns(): array
-    {
-        return [
-            Tables\Columns\TextColumn::make('EPS') // debe coincidir con tu DB
-                ->label('EPS')
-                ->sortable(),
-
-            Tables\Columns\TextColumn::make('anio')
-                ->label('Año')
-                ->sortable(),
-
-            Tables\Columns\TextColumn::make('mes')
-                ->label('Mes')
-                ->sortable()
-                ->formatStateUsing(fn ($state) => str_pad($state, 2, '0', STR_PAD_LEFT)),
-
-            Tables\Columns\TextColumn::make('total')
-                ->label('Valor Total')
-                ->money('COP', true)
-                ->sortable(),
+        $meses = [
+            1 => 'Enero', 2 => 'Febrero', 3 => 'Marzo', 4 => 'Abril',
+            5 => 'Mayo', 6 => 'Junio', 7 => 'Julio', 8 => 'Agosto',
+            9 => 'Septiembre', 10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre'
         ];
+
+        $pivoted = [];
+        foreach ($data as $row) {
+            $eps = $row->EPS;
+            $mes = $meses[$row->mes] ?? $row->mes;
+            $total = $row->total;
+
+            if (!isset($pivoted[$eps])) {
+                $pivoted[$eps] = ['eps' => $eps, 'Total Anual' => 0];
+                foreach ($meses as $nombreMes) {
+                    $pivoted[$eps][$nombreMes] = 0;
+                }
+            }
+
+            $pivoted[$eps][$mes] = $total;
+            $pivoted[$eps]['Total Anual'] += $total;
+        }
+
+        $this->datosPivot = collect(array_values($pivoted));
     }
+
+
+    public static function canView(): bool
+{
+    return false;
 }
+
+}
+
+
