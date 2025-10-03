@@ -70,4 +70,32 @@ protected int | string | array $columnSpan = '1/3';
     return false;
 }
 
+
+
+protected function getOptions(): array
+    {
+        return [
+            'scales' => [
+                'x' => [
+                    'display' => false, // oculta eje X
+                    'ticks' => [
+                        'display' => false, // oculta números debajo
+                    ],
+                ],
+                'y' => [
+                    'display' => false, // oculta eje Y
+                    'ticks' => [
+                        'display' => false, // oculta números a la izquierda
+                    ],
+                ],
+            ],
+            'plugins' => [
+                'legend' => [
+                    'display' => true, // deja la leyenda visible
+                ],
+            ],
+        ];
+    }
+
+
 }
