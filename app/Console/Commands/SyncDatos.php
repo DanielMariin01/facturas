@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB; 
 use Illuminate\Support\Facades\Schema;
 
+
 class SyncDatos extends Command
 {
     protected $signature = 'app:sync-datos';
@@ -14,6 +15,8 @@ class SyncDatos extends Command
     public function handle()
     {
         $this->info("Iniciando sincronización de datos...");
+
+          DB::connection('mysql')->table('facturado')->Delete();
 
         // Columnas válidas en MySQL
         $campos_mysql = Schema::connection('mysql')->getColumnListing('facturado');

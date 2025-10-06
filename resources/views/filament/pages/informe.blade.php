@@ -1,9 +1,10 @@
 <x-filament::page>
     <div class="space-y-6">
-        <!-- Aquí se muestra el gráfico -->
+        <!-- 🔹 Widget de Filament (ChartWidget) -->
         @livewire(\App\Filament\Widgets\ValorTotalPieChart::class)
 
-        <!-- Aquí se muestra la tabla -->
-        @livewire(\App\Filament\Widgets\TotalesPorMesWidget::class)
+        <!-- 🔹 Componente Livewire normal -->
+<livewire:widgets.totales-por-mes-widget :wire:key="'totales-por-mes-'.uniqid()" />
+
     </div>
 </x-filament::page>
