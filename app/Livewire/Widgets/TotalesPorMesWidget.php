@@ -7,20 +7,19 @@ use Livewire\WithPagination;
 use App\Models\Facturado;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class TotalesPorMesWidget extends Component
 {
     use WithPagination;
 
     public $estado = '';
+    public $perPage = 10;
 
     public function updatedEstado()
     {
-
-
-            \Log::info("✅ hola no se cargo: {$this->estado}");
-        $this->resetPage(); // resetea paginación
-       
+        \Log::info("✅ updatedEstado ejecutado con valor: {$this->estado}");
+        $this->resetPage();
     }
 
     public function getEstados()
@@ -36,16 +35,13 @@ class TotalesPorMesWidget extends Component
                 MONTH(Fec_Ingreso) as mes,
                 SUM(Vl_Total) as total
             ')
+            ->when($this->estado, function ($q) {
+                $q->whereRaw("TRIM(LOWER(Estado)) = ?", [strtolower(trim($this->estado))]);
+            })
             ->groupBy('EPS', DB::raw('YEAR(Fec_Ingreso)'), DB::raw('MONTH(Fec_Ingreso)'))
-            ->orderBy('EPS')
-            ->orderByRaw('YEAR(Fec_Ingreso) ASC')
-            ->orderByRaw('MONTH(Fec_Ingreso) ASC');
+            ->orderBy('EPS');
 
-        if (!empty($this->estado)) {
-            $query->whereRaw("TRIM(LOWER(Estado)) = ?", [strtolower(trim($this->estado))]);
-        }
-
-        $facturados = $query->paginate(10);
+        $rawData = $query->get();
 
         $meses = [
             1 => 'Enero', 2 => 'Febrero', 3 => 'Marzo', 4 => 'Abril',
@@ -53,14 +49,31 @@ class TotalesPorMesWidget extends Component
             9 => 'Septiembre', 10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre'
         ];
 
-        foreach ($facturados as $item) {
-            $item->mes_nombre = $meses[$item->mes] ?? $item->mes;
+        // 🔸 Pivot agrupado por EPS y Año
+        $pivotData = [];
+        foreach ($rawData as $item) {
+            $eps = $item->EPS . " ({$item->anio})";
+            $mes = $meses[$item->mes] ?? $item->mes;
+            $pivotData[$eps][$mes] = $item->total;
         }
+
+        // 🔸 Ordenar EPS alfabéticamente
+        ksort($pivotData);
+
+        // 🔸 Paginación manual (10 EPS por página)
+        $page = $this->page ?? 1;
+        $total = count($pivotData);
+        $items = collect($pivotData)->forPage($page, $this->perPage);
+        $paginator = new LengthAwarePaginator($items, $total, $this->perPage, $page, [
+            'path' => request()->url(),
+            'query' => request()->query(),
+        ]);
 
         Log::info("♻️ Render ejecutado. Estado actual: {$this->estado}");
 
         return view('livewire.widgets.totales-por-mes-widget', [
-            'facturados' => $facturados,
+            'pivotData' => $paginator,
+            'meses' => $meses,
             'estados' => $this->getEstados(),
         ]);
     }
