@@ -10,8 +10,8 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class TotalesPorMesWidget extends Component
 {
-    // no usamos WithPagination para evitar conflicto con $page interno
     public $estado = '';
+    public $epsSeleccionada = '';
     public $perPage = 10;
     public $paginaActual = 1;
 
@@ -20,25 +20,29 @@ class TotalesPorMesWidget extends Component
         $this->paginaActual = 1;
     }
 
-    // al cambiar estado volvemos a la primera página
+    // 🔹 Cuando cambia el estado, reiniciamos EPS y página
     public function updatedEstado()
     {
+        $this->epsSeleccionada = '';
         $this->paginaActual = 1;
-        Log::info("✅ updatedEstado ejecutado con valor: {$this->estado}");
+        Log::info("✅ Estado cambiado a: {$this->estado}");
     }
 
-    // método para cambiar la página (usado por los botones)
+    // 🔹 Cuando cambia la EPS, reiniciamos a la primera página
+    public function updatedEpsSeleccionada()
+    {
+        $this->paginaActual = 1;
+        Log::info("✅ EPS cambiada a: {$this->epsSeleccionada}");
+    }
+
+    // 🔹 Cambio manual de página
     public function cambiarPagina($numero)
     {
-        $numero = (int) $numero;
-        if ($numero < 1) {
-            $numero = 1;
-        }
-        $this->paginaActual = $numero;
+        $this->paginaActual = max(1, (int) $numero);
         Log::info("📄 Cambiando a página: {$this->paginaActual}");
     }
 
-    // helper para obtener estados (!devuelve array)
+    // 🔹 Obtener lista de estados (para el select)
     public function getEstados()
     {
         return Facturado::selectRaw('TRIM(Estado) as Estado')
@@ -48,9 +52,20 @@ class TotalesPorMesWidget extends Component
             ->toArray();
     }
 
+    // 🔹 Obtener lista de EPS filtradas por estado (si aplica)
+    public function getEps()
+    {
+        $query = Facturado::selectRaw('TRIM(EPS) as EPS')->distinct();
+
+        if ($this->estado) {
+            $query->whereRaw("TRIM(LOWER(Estado)) = ?", [strtolower(trim($this->estado))]);
+        }
+
+        return $query->orderBy('EPS')->pluck('EPS')->toArray();
+    }
+
     public function render()
     {
-        // Consulta base (filtra por estado si aplica)
         $query = Facturado::selectRaw('
                 EPS,
                 YEAR(Fec_Ingreso) as anio,
@@ -59,6 +74,9 @@ class TotalesPorMesWidget extends Component
             ')
             ->when($this->estado, function ($q) {
                 $q->whereRaw("TRIM(LOWER(Estado)) = ?", [strtolower(trim($this->estado))]);
+            })
+            ->when($this->epsSeleccionada, function ($q) {
+                $q->whereRaw("TRIM(LOWER(EPS)) = ?", [strtolower(trim($this->epsSeleccionada))]);
             })
             ->groupBy('EPS', DB::raw('YEAR(Fec_Ingreso)'), DB::raw('MONTH(Fec_Ingreso)'))
             ->orderBy('EPS');
@@ -71,30 +89,26 @@ class TotalesPorMesWidget extends Component
             9 => 'Septiembre', 10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre'
         ];
 
-        // Pivot: agrupado por "EPS (año)" -> [mes => total]
+        // 🔸 Crear estructura tipo pivot EPS(Año) → [Mes => Total]
         $pivot = [];
         foreach ($rawData as $item) {
             $epsKey = trim($item->EPS) . " ({$item->anio})";
             $mesNombre = $meses[$item->mes] ?? $item->mes;
             $pivot[$epsKey][$mesNombre] = $item->total;
         }
-        ksort($pivot); // ordenar EPS
+        ksort($pivot);
 
-        // Convertimos a colección con estructura: [ ['eps' => 'SURA (2024)', 'valores' => [...]], ... ]
-        $flat = collect($pivot)->map(function ($val, $eps) {
-            return [
-                'eps' => $eps,
-                'valores' => $val,
-            ];
-        })->values();
+        $flat = collect($pivot)->map(fn($val, $eps) => [
+            'eps' => $eps,
+            'valores' => $val,
+        ])->values();
 
         $totalItems = $flat->count();
         $page = max(1, (int) $this->paginaActual);
         $itemsForPage = $flat->forPage($page, $this->perPage);
 
-        // LengthAwarePaginator con los items ya preparados
         $paginator = new LengthAwarePaginator(
-            $itemsForPage->values(), // items de la página
+            $itemsForPage->values(),
             $totalItems,
             $this->perPage,
             $page,
@@ -104,12 +118,13 @@ class TotalesPorMesWidget extends Component
             ]
         );
 
-        Log::info("♻️ Render ejecutado — Página actual: {$page} — total EPS: {$totalItems} — Estado filtro: '{$this->estado}'");
+        Log::info("♻️ Render ejecutado — Estado: '{$this->estado}' — EPS: '{$this->epsSeleccionada}' — Página: {$page}");
 
         return view('livewire.widgets.totales-por-mes-widget', [
-            'pivotData' => $paginator, // LengthAwarePaginator
+            'pivotData' => $paginator,
             'meses' => $meses,
             'estados' => $this->getEstados(),
+            'epsList' => $this->getEps(),
         ]);
     }
 }
