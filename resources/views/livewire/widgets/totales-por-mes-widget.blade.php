@@ -1,14 +1,13 @@
-<div class="w-full px-4 py-4">
-    {{-- 🔽 Filtros --}}
-    <div class="mb-6 flex space-x-6">
-        {{-- Filtro Estado --}}
+<div style="width: 100%; padding: 1rem; font-family: Arial, sans-serif;">
+    <!-- 🔽 Filtros -->
+    <div style="margin-bottom: 1.5rem; display: flex; flex-wrap: wrap; gap: 1.5rem;">
+        <!-- Filtro Estado -->
         <div>
-            <label for="estado" class="block text-sm font-medium text-gray-700 mb-1">
+            <label for="estado" style="display: block; font-size: 0.875rem; font-weight: 600; color: #4B5563; margin-bottom: 0.25rem;">
                 Estado:
             </label>
-            <select wire:model.live="estado"
-                    id="estado"
-                    class="block w-48 border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+            <select wire:model.live="estado" id="estado"
+                    style="width: 12rem; padding: 0.5rem; border: 1px solid #D1D5DB; border-radius: 0.5rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
                 <option value="">Todos</option>
                 @foreach ($estados as $itemEstado)
                     <option value="{{ $itemEstado }}">{{ $itemEstado }}</option>
@@ -16,14 +15,13 @@
             </select>
         </div>
 
-        {{-- Filtro EPS --}}
+        <!-- Filtro EPS -->
         <div>
-            <label for="eps" class="block text-sm font-medium text-gray-700 mb-1">
+            <label for="eps" style="display: block; font-size: 0.875rem; font-weight: 600; color: #4B5563; margin-bottom: 0.25rem;">
                 EPS:
             </label>
-            <select wire:model.live="epsSeleccionada"
-                    id="eps"
-                    class="block w-64 border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+            <select wire:model.live="epsSeleccionada" id="eps"
+                    style="width: 16rem; padding: 0.5rem; border: 1px solid #D1D5DB; border-radius: 0.5rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
                 <option value="">Todas</option>
                 @foreach ($epsList as $eps)
                     <option value="{{ $eps }}">{{ $eps }}</option>
@@ -32,23 +30,25 @@
         </div>
     </div>
 
-    {{-- 🧩 Tabla --}}
-    <div class="overflow-x-auto">
-        <table class="min-w-full border divide-y divide-gray-200">
-            <thead class="bg-indigo-100">
+    <!-- 🧩 Tabla -->
+    <div style="overflow-x: auto; border: 1px solid #D1D5DB; border-radius: 0.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+        <table style="width: 100%; border-collapse: collapse; min-width: 600px;">
+            <thead style="background-color: #00B5B5; color: white;">
                 <tr>
-                    <th class="px-4 py-2 text-left font-semibold text-gray-700">EPS / Año</th>
+                    <th style="padding: 0.5rem 1rem; text-align: left; font-weight: 600; border-bottom: 1px solid #CCCCCC;">EPS / Año</th>
                     @foreach ($meses as $nombreMes)
-                        <th class="px-4 py-2 text-right font-semibold text-gray-700">{{ $nombreMes }}</th>
+                        <th style="padding: 0.5rem 1rem; text-align: right; font-weight: 600; border-bottom: 1px solid #CCCCCC;">{{ $nombreMes }}</th>
                     @endforeach
                 </tr>
             </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-                @forelse ($pivotData as $row)
-                    <tr>
-                        <td class="px-4 py-2 font-medium text-gray-800">{{ $row['eps'] }}</td>
+            <tbody>
+                @forelse ($pivotData as $index => $row)
+                    <tr style="background-color: {{ $index % 2 == 0 ? '#E0F7F7' : '#B3EAEA' }}; transition: background-color 0.3s;" 
+                        onmouseover="this.style.backgroundColor='#80DDDD'" 
+                        onmouseout="this.style.backgroundColor='{{ $index % 2 == 0 ? '#E0F7F7' : '#B3EAEA' }}'">
+                        <td style="padding: 0.5rem 1rem; font-weight: 500; color: #1F2937;">{{ $row['eps'] }}</td>
                         @foreach ($meses as $nombreMes)
-                            <td class="px-4 py-2 text-right">
+                            <td style="padding: 0.5rem 1rem; text-align: right; color: #1F2937;">
                                 @if(isset($row['valores'][$nombreMes]))
                                     ${{ number_format($row['valores'][$nombreMes], 0, ',', '.') }}
                                 @else
@@ -59,7 +59,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="{{ count($meses) + 1 }}" class="px-4 py-4 text-center text-gray-500">
+                        <td colspan="{{ count($meses) + 1 }}" style="padding: 1rem; text-align: center; color: #6B7280;">
                             No hay datos para los filtros seleccionados.
                         </td>
                     </tr>
@@ -68,14 +68,15 @@
         </table>
     </div>
 
-    {{-- 📄 Paginación personalizada (igual que antes) --}}
-    <div class="mt-4 flex justify-center">
-        <div class="inline-flex items-center space-x-2">
+    <!-- 📄 Paginación personalizada -->
+    <div style="margin-top: 1rem; display: flex; justify-content: center;">
+        <div style="display: inline-flex; gap: 0.5rem; align-items: center;">
             @if ($pivotData->currentPage() > 1)
                 <button wire:click="cambiarPagina({{ $pivotData->currentPage() - 1 }})"
-                        class="px-3 py-1 text-gray-700 bg-white border border-gray-300 rounded hover:bg-indigo-50">‹</button>
+                        style="padding: 0.25rem 0.75rem; color: #1F2937; background-color: white; border: 1px solid #D1D5DB; border-radius: 0.375rem; cursor: pointer;"
+                        onmouseover="this.style.backgroundColor='#B3EAEA'" onmouseout="this.style.backgroundColor='white'">‹</button>
             @else
-                <span class="px-3 py-1 text-gray-400 bg-gray-100 border border-gray-200 rounded cursor-not-allowed">‹</span>
+                <span style="padding: 0.25rem 0.75rem; color: #9CA3AF; background-color: #F3F4F6; border: 1px solid #E5E7EB; border-radius: 0.375rem;">‹</span>
             @endif
 
             @php
@@ -87,18 +88,20 @@
 
             @for ($i = $start; $i <= $end; $i++)
                 @if ($i == $current)
-                    <span class="px-3 py-1 bg-indigo-600 text-white border border-indigo-600 rounded font-semibold">{{ $i }}</span>
+                    <span style="padding: 0.25rem 0.75rem; background-color: #00B5B5; color: white; border: 1px solid #00B5B5; border-radius: 0.375rem; font-weight: 600;">{{ $i }}</span>
                 @else
                     <button wire:click="cambiarPagina({{ $i }})"
-                            class="px-3 py-1 bg-white border border-gray-300 rounded hover:bg-indigo-50">{{ $i }}</button>
+                            style="padding: 0.25rem 0.75rem; background-color: white; color: #1F2937; border: 1px solid #D1D5DB; border-radius: 0.375rem; cursor: pointer;"
+                            onmouseover="this.style.backgroundColor='#B3EAEA'" onmouseout="this.style.backgroundColor='white'">{{ $i }}</button>
                 @endif
             @endfor
 
             @if ($pivotData->hasMorePages())
                 <button wire:click="cambiarPagina({{ $pivotData->currentPage() + 1 }})"
-                        class="px-3 py-1 text-gray-700 bg-white border border-gray-300 rounded hover:bg-indigo-50">›</button>
+                        style="padding: 0.25rem 0.75rem; color: #1F2937; background-color: white; border: 1px solid #D1D5DB; border-radius: 0.375rem; cursor: pointer;"
+                        onmouseover="this.style.backgroundColor='#B3EAEA'" onmouseout="this.style.backgroundColor='white'">›</button>
             @else
-                <span class="px-3 py-1 text-gray-400 bg-gray-100 border border-gray-200 rounded cursor-not-allowed">›</span>
+                <span style="padding: 0.25rem 0.75rem; color: #9CA3AF; background-color: #F3F4F6; border: 1px solid #E5E7EB; border-radius: 0.375rem;">›</span>
             @endif
         </div>
     </div>

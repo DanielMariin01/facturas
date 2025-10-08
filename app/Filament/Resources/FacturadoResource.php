@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\FacturadoResource\Pages;
 use App\Filament\Resources\FacturadoResource\RelationManagers;
 use App\Models\Facturado;
+use App\Models\FacturadoVista;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -32,7 +33,7 @@ use Illuminate\Support\Facades\Cache;
 
 class FacturadoResource extends Resource
 {
-    protected static ?string $model = Facturado::class;
+    protected static ?string $model = FacturadoVista::class;
   protected static ?string $navigationIcon = 'heroicon-o-document-currency-dollar';
 protected static ?int $navigationSort = 2;
 
@@ -209,11 +210,6 @@ public static function canEdit(Model $record): bool
     }
 
     
-    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
-{
-    return parent::getEloquentQuery()
-        ->where('estado', 'facturado')
-        ->selectRaw('facturado.*, DATEDIFF(NOW(), Fec_Ingreso) as dias_facturado');// 👈 aquí aplicas el filtro permanente
-}
+
 
 }

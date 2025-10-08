@@ -40,7 +40,7 @@ protected int | string | array $columnSpan = '1/3';
 
         
                $colores = [
-            'Facturado'   => '#17cfb1ff', // verde
+            'Facturado'   => '#00B5B5', // verde
             'Radicado'   => '#076affff', // azul
             'Ingreso_abierto'     => '#e70d0dff', // rojo
             'Paciente_acostado'  => '#f4e136ff', // amarillo
