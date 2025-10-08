@@ -43,9 +43,9 @@
             </thead>
             <tbody>
                 @forelse ($pivotData as $index => $row)
-                    <tr style="background-color: {{ $index % 2 == 0 ? '#E0F7F7' : '#B3EAEA' }}; transition: background-color 0.3s;" 
-                        onmouseover="this.style.backgroundColor='#80DDDD'" 
-                        onmouseout="this.style.backgroundColor='{{ $index % 2 == 0 ? '#E0F7F7' : '#B3EAEA' }}'">
+                    <tr style="background-color: {{ $index % 2 == 0 ? '#E0F7F7' : '#E0F7F' }}; transition: background-color 0.3s;" 
+                        onmouseover="this.style.backgroundColor='#B3EAEA'" 
+                        onmouseout="this.style.backgroundColor='{{ $index % 2 == 0 ? '#E0F7F7' : '#E0F7F7' }}'">
                         <td style="padding: 0.5rem 1rem; font-weight: 500; color: #1F2937;">{{ $row['eps'] }}</td>
                         @foreach ($meses as $nombreMes)
                             <td style="padding: 0.5rem 1rem; text-align: right; color: #1F2937;">
