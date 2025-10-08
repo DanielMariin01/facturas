@@ -43,20 +43,18 @@
             </thead>
             <tbody>
                 @forelse ($pivotData as $index => $row)
-                    <tr style="background-color: {{ $index % 2 == 0 ? '#E0F7F7' : '#E0F7F' }}; transition: background-color 0.3s;" 
-                        onmouseover="this.style.backgroundColor='#B3EAEA'" 
-                        onmouseout="this.style.backgroundColor='{{ $index % 2 == 0 ? '#E0F7F7' : '#E0F7F7' }}'">
-                        <td style="padding: 0.5rem 1rem; font-weight: 500; color: #1F2937;">{{ $row['eps'] }}</td>
-                        @foreach ($meses as $nombreMes)
-                            <td style="padding: 0.5rem 1rem; text-align: right; color: #1F2937;">
-                                @if(isset($row['valores'][$nombreMes]))
-                                    ${{ number_format($row['valores'][$nombreMes], 0, ',', '.') }}
-                                @else
-                                    -
-                                @endif
-                            </td>
-                        @endforeach
-                    </tr>
+               <tr style="background-color: {{ $index % 2 == 0 ? '#f3fdfdff' : '#f3fdfdff' }};">
+    <td style="padding: 0.5rem 1rem; font-weight: 500; color: #1F2937;">{{ $row['eps'] }}</td>
+    @foreach ($meses as $nombreMes)
+        <td style="padding: 0.5rem 1rem; text-align: right; color: #1F2937;">
+            @if(isset($row['valores'][$nombreMes]))
+                ${{ number_format($row['valores'][$nombreMes], 0, ',', '.') }}
+            @else
+                -
+            @endif
+        </td>
+    @endforeach
+</tr>
                 @empty
                     <tr>
                         <td colspan="{{ count($meses) + 1 }}" style="padding: 1rem; text-align: center; color: #6B7280;">
