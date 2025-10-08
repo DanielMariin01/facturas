@@ -35,29 +35,36 @@
         <table style="width: 100%; border-collapse: collapse; min-width: 600px;">
             <thead style="background-color: #00B5B5; color: white;">
                 <tr>
-                    <th style="padding: 0.5rem 1rem; text-align: left; font-weight: 600; border-bottom: 1px solid #CCCCCC;">EPS / Año</th>
+                    <th style="padding: 0.5rem 1rem; text-align: left; font-weight: 600; border: 1px solid #D1D5DB;">EPS / Año</th>
                     @foreach ($meses as $nombreMes)
-                        <th style="padding: 0.5rem 1rem; text-align: right; font-weight: 600; border-bottom: 1px solid #CCCCCC;">{{ $nombreMes }}</th>
+                        <th style="padding: 0.5rem 1rem; text-align: right; font-weight: 600; border: 1px solid #D1D5DB;">{{ $nombreMes }}</th>
                     @endforeach
                 </tr>
             </thead>
             <tbody>
                 @forelse ($pivotData as $index => $row)
-               <tr style="background-color: {{ $index % 2 == 0 ? '#f3fdfdff' : '#f3fdfdff' }};">
-    <td style="padding: 0.5rem 1rem; font-weight: 500; color: #1F2937;">{{ $row['eps'] }}</td>
-    @foreach ($meses as $nombreMes)
-        <td style="padding: 0.5rem 1rem; text-align: right; color: #1F2937;">
-            @if(isset($row['valores'][$nombreMes]))
-                ${{ number_format($row['valores'][$nombreMes], 0, ',', '.') }}
-            @else
-                -
-            @endif
-        </td>
-    @endforeach
-</tr>
+                    @php
+                        $rowColor = $index % 2 == 0 ? '#f3fdfdff' : '#f3fdfdff';
+                    @endphp
+                    <tr style="background-color: {{ $rowColor }};"
+                        onmouseover="this.style.backgroundColor='#B3EAEA'"
+                        onmouseout="this.style.backgroundColor='{{ $rowColor }}'">
+                        <td style="padding: 0.5rem 1rem; font-weight: 500; color: #1F2937; border: 1px solid #D1D5DB;">
+                            {{ $row['eps'] }}
+                        </td>
+                        @foreach ($meses as $nombreMes)
+                            <td style="padding: 0.5rem 1rem; text-align: right; color: #1F2937; border: 1px solid #D1D5DB;">
+                                @if(isset($row['valores'][$nombreMes]))
+                                    ${{ number_format($row['valores'][$nombreMes], 0, ',', '.') }}
+                                @else
+                                    -
+                                @endif
+                            </td>
+                        @endforeach
+                    </tr>
                 @empty
                     <tr>
-                        <td colspan="{{ count($meses) + 1 }}" style="padding: 1rem; text-align: center; color: #6B7280;">
+                        <td colspan="{{ count($meses) + 1 }}" style="padding: 1rem; text-align: center; color: #6B7280; border: 1px solid #D1D5DB;">
                             No hay datos para los filtros seleccionados.
                         </td>
                     </tr>
@@ -72,7 +79,8 @@
             @if ($pivotData->currentPage() > 1)
                 <button wire:click="cambiarPagina({{ $pivotData->currentPage() - 1 }})"
                         style="padding: 0.25rem 0.75rem; color: #1F2937; background-color: white; border: 1px solid #D1D5DB; border-radius: 0.375rem; cursor: pointer;"
-                        onmouseover="this.style.backgroundColor='#B3EAEA'" onmouseout="this.style.backgroundColor='white'">‹</button>
+                        onmouseover="this.style.backgroundColor='#B3EAEA'"
+                        onmouseout="this.style.backgroundColor='white'">‹</button>
             @else
                 <span style="padding: 0.25rem 0.75rem; color: #9CA3AF; background-color: #F3F4F6; border: 1px solid #E5E7EB; border-radius: 0.375rem;">‹</span>
             @endif
@@ -90,14 +98,16 @@
                 @else
                     <button wire:click="cambiarPagina({{ $i }})"
                             style="padding: 0.25rem 0.75rem; background-color: white; color: #1F2937; border: 1px solid #D1D5DB; border-radius: 0.375rem; cursor: pointer;"
-                            onmouseover="this.style.backgroundColor='#B3EAEA'" onmouseout="this.style.backgroundColor='white'">{{ $i }}</button>
+                            onmouseover="this.style.backgroundColor='#B3EAEA'"
+                            onmouseout="this.style.backgroundColor='white'">{{ $i }}</button>
                 @endif
             @endfor
 
             @if ($pivotData->hasMorePages())
                 <button wire:click="cambiarPagina({{ $pivotData->currentPage() + 1 }})"
                         style="padding: 0.25rem 0.75rem; color: #1F2937; background-color: white; border: 1px solid #D1D5DB; border-radius: 0.375rem; cursor: pointer;"
-                        onmouseover="this.style.backgroundColor='#B3EAEA'" onmouseout="this.style.backgroundColor='white'">›</button>
+                        onmouseover="this.style.backgroundColor='#B3EAEA'"
+                        onmouseout="this.style.backgroundColor='white'">›</button>
             @else
                 <span style="padding: 0.25rem 0.75rem; color: #9CA3AF; background-color: #F3F4F6; border: 1px solid #E5E7EB; border-radius: 0.375rem;">›</span>
             @endif
