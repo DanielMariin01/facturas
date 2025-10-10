@@ -16,7 +16,8 @@ class SyncDatos extends Command
     {
         $this->info("Iniciando sincronización de datos...");
 
-          DB::connection('mysql')->table('facturado')->Delete();
+          
+        DB::connection('mysql')->table('facturado')->Delete();
 
         // Columnas válidas en MySQL
         $campos_mysql = Schema::connection('mysql')->getColumnListing('facturado');
