@@ -21,6 +21,14 @@ class TotalesPorMesWidget extends Component
         $this->paginaActual = 1;
     }
 
+
+
+    public function aplicarFiltros()
+{
+    $this->paginaActual = 1;
+    \Log::info("🔍 Aplicando filtros — Estado: {$this->estado}, EPS: {$this->epsSeleccionada}, Convenio: {$this->convenioSeleccionado}");
+}
+
     // 🔹 Cuando cambia el estado, reiniciamos EPS y página
     public function updatedEstado()
     {
@@ -77,20 +85,20 @@ public function updatedConvenioSeleccionado()
     }
 
     // 🔹 Obtener lista de convenios filtrados por estado y EPS (si aplica)
-public function getConvenios()
-{
-    $query = \App\Models\Facturado::selectRaw('TRIM(Convenio) as Convenio')->distinct();
+//public function getConvenios()
+//{
+    //$query = \App\Models\Facturado::selectRaw('TRIM(Convenio) as Convenio')->distinct();
 
-    if ($this->estado) {
-        $query->whereRaw("TRIM(LOWER(Estado)) = ?", [strtolower(trim($this->estado))]);
-    }
+    //if ($this->estado) {
+        //$query->whereRaw("TRIM(LOWER(Estado)) = ?", [strtolower(trim($this->estado))]);
+    //}
 
-    if ($this->epsSeleccionada) {
-        $query->whereRaw("TRIM(LOWER(EPS)) = ?", [strtolower(trim($this->epsSeleccionada))]);
-    }
+    //if ($this->epsSeleccionada) {
+       // $query->whereRaw("TRIM(LOWER(EPS)) = ?", [strtolower(trim($this->epsSeleccionada))]);
+   // }
 
-    return $query->orderBy('Convenio')->pluck('Convenio')->toArray();
-}
+   // return $query->orderBy('Convenio')->pluck('Convenio')->toArray();
+//}
 
 
     public function render()
@@ -107,10 +115,10 @@ public function getConvenios()
             ->when($this->epsSeleccionada, function ($q) {
                 $q->whereRaw("TRIM(LOWER(EPS)) = ?", [strtolower(trim($this->epsSeleccionada))]);
             })
-            ->when($this->convenioSeleccionado, function ($q) {
-    $q->whereRaw("TRIM(LOWER(Convenio)) = ?", [strtolower(trim($this->convenioSeleccionado))]);
+    ->when($this->convenioSeleccionado, function ($q) {
+    $valor = strtolower(trim($this->convenioSeleccionado));
+    $q->whereRaw("LOWER(TRIM(Convenio)) LIKE ?", ["%{$valor}%"]);
 })
-
             ->groupBy('EPS', DB::raw('YEAR(Fec_Ingreso)'), DB::raw('MONTH(Fec_Ingreso)'))
             ->orderBy('EPS');
 
@@ -158,7 +166,7 @@ public function getConvenios()
             'meses' => $meses,
             'estados' => $this->getEstados(),
             'epsList' => $this->getEps(),
-            'convenios' => $this->getConvenios(),
+            //'convenios' => $this->getConvenios(),
         ]);
     }
 }
