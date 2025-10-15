@@ -15,6 +15,19 @@
             </select>
         </div>
 
+        <div>
+    <label for="convenio" style="display: block; font-size: 0.875rem; font-weight: 600; color: #4B5563; margin-bottom: 0.25rem;">
+        Convenio:
+    </label>
+    <select wire:model.live="convenioSeleccionado" id="convenio"
+            style="width: 16rem; padding: 0.5rem; border: 1px solid #D1D5DB; border-radius: 0.5rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+        <option value="">Todos</option>
+        @foreach ($convenios as $convenio)
+            <option value="{{ $convenio }}">{{ $convenio }}</option>
+        @endforeach
+    </select>
+</div>
+
         <!-- Filtro EPS -->
         <div>
             <label for="eps" style="display: block; font-size: 0.875rem; font-weight: 600; color: #4B5563; margin-bottom: 0.25rem;">
@@ -29,6 +42,9 @@
             </select>
         </div>
     </div>
+
+    <!-- Filtro Convenio -->
+
 
     <!-- 🧩 Tabla -->
     <div style="overflow-x: auto; border: 1px solid #D1D5DB; border-radius: 0.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">

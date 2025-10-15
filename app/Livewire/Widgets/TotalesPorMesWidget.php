@@ -12,6 +12,7 @@ class TotalesPorMesWidget extends Component
 {
     public $estado = '';
     public $epsSeleccionada = '';
+    public $convenioSeleccionado = '';
     public $perPage = 10;
     public $paginaActual = 1;
 
@@ -34,6 +35,17 @@ class TotalesPorMesWidget extends Component
         $this->paginaActual = 1;
         Log::info("✅ EPS cambiada a: {$this->epsSeleccionada}");
     }
+
+
+// 🔹 Cuando cambia el convenio, reiniciamos a la primera página
+public function updatedConvenioSeleccionado()
+{
+    $this->paginaActual = 1;
+    \Log::info("✅ Convenio cambiado a: {$this->convenioSeleccionado}");
+}
+
+
+
 
     // 🔹 Cambio manual de página
     public function cambiarPagina($numero)
@@ -64,6 +76,23 @@ class TotalesPorMesWidget extends Component
         return $query->orderBy('EPS')->pluck('EPS')->toArray();
     }
 
+    // 🔹 Obtener lista de convenios filtrados por estado y EPS (si aplica)
+public function getConvenios()
+{
+    $query = \App\Models\Facturado::selectRaw('TRIM(Convenio) as Convenio')->distinct();
+
+    if ($this->estado) {
+        $query->whereRaw("TRIM(LOWER(Estado)) = ?", [strtolower(trim($this->estado))]);
+    }
+
+    if ($this->epsSeleccionada) {
+        $query->whereRaw("TRIM(LOWER(EPS)) = ?", [strtolower(trim($this->epsSeleccionada))]);
+    }
+
+    return $query->orderBy('Convenio')->pluck('Convenio')->toArray();
+}
+
+
     public function render()
     {
         $query = Facturado::selectRaw('
@@ -78,6 +107,10 @@ class TotalesPorMesWidget extends Component
             ->when($this->epsSeleccionada, function ($q) {
                 $q->whereRaw("TRIM(LOWER(EPS)) = ?", [strtolower(trim($this->epsSeleccionada))]);
             })
+            ->when($this->convenioSeleccionado, function ($q) {
+    $q->whereRaw("TRIM(LOWER(Convenio)) = ?", [strtolower(trim($this->convenioSeleccionado))]);
+})
+
             ->groupBy('EPS', DB::raw('YEAR(Fec_Ingreso)'), DB::raw('MONTH(Fec_Ingreso)'))
             ->orderBy('EPS');
 
@@ -125,6 +158,7 @@ class TotalesPorMesWidget extends Component
             'meses' => $meses,
             'estados' => $this->getEstados(),
             'epsList' => $this->getEps(),
+            'convenios' => $this->getConvenios(),
         ]);
     }
 }
