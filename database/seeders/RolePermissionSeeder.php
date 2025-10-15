@@ -2,43 +2,67 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use App\Models\User;
+use Illuminate\Support\Facades\Artisan;
+use Spatie\Permission\PermissionRegistrar;
 
 class RolePermissionSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
-     public function run()
+    public function run(): void
     {
-        // Limpiar cache de permisos antes de crear
-        app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+        // Limpiar cache antes de crear
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
 
-        // Crear permisos
-        Permission::create(['name' => 'users.view']);
-        Permission::create(['name' => 'users.create']);
-        Permission::create(['name' => 'users.update']);
-        Permission::create(['name' => 'users.delete']);
+        // ==========================
+        // 🧱 Crear permisos
+        // ==========================
+        $permissions = [
+            'users.view',
+            'users.create',
+            'users.update',
+            'users.delete',
+            'reports.view',
+            'filament.access',
+        ];
 
-        Permission::create(['name' => 'filament.access']); // permiso para acceder al panel (opcional)
+        foreach ($permissions as $perm) {
+            Permission::firstOrCreate(['name' => $perm, 'guard_name' => 'web']);
+        }
 
-        // Crear rol y asignar permisos
-        $admin = Role::create(['name' => 'admin']);
-        $usuario = Role::firstOrCreate(['name' => 'usuario']);
-        $admin->givePermissionTo(Permission::all());
+        // ==========================
+        // 👑 Crear roles
+        // ==========================
+        $admin = Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
+        $usuario = Role::firstOrCreate(['name' => 'usuario', 'guard_name' => 'web']);
+        $gerencia = Role::firstOrCreate(['name' => 'gerencia', 'guard_name' => 'web']);
 
-        // Usuario super-admin ejemplo (ajusta email/clave)
-        $u = User::firstOrCreate(
+        // ==========================
+        // 🔑 Asignar permisos a roles
+        // ==========================
+        $admin->syncPermissions(Permission::all());
+
+        $gerencia->syncPermissions([
+            'reports.view',
+        ]);
+
+        // ==========================
+        // 👤 Crear usuario admin
+        // ==========================
+        $user = User::firstOrCreate(
             ['email' => 'admin@tuapp.test'],
             ['name' => 'Admin', 'password' => bcrypt('secret')]
         );
-        $u->assignRole('admin');
 
-        // Reset cache
-        \Artisan::call('permission:cache-reset');
+        $user->assignRole($admin);
+
+        // ==========================
+        // 🧹 Reset cache
+        // ==========================
+        Artisan::call('permission:cache-reset');
+
+        $this->command->info('Roles, permisos y usuario admin creados correctamente ✅');
     }
 }

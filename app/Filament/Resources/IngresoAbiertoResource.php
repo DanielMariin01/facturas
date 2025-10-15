@@ -62,7 +62,7 @@ public static function canEdit(Model $record): bool
         return $table
             ->columns([
              
-FBadgeColumn::make('dias_ingreso_abierto')
+FBadgeColumn::make('dias_facturado')
     ->label('Días Ingreso Abierto')
     ->getStateUsing(fn($record) => $record->Estado === 'Ingreso_abierto' 
         ? $record->dias_facturado 

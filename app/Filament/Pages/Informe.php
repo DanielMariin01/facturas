@@ -12,17 +12,18 @@ class Informe extends Page
     protected static string $view = 'filament.pages.informe';
 
 
-    public static function shouldRegisterNavigation(): bool
+ public static function shouldRegisterNavigation(): bool
 {
-    // Oculta del menú a todos los que no sean admin
-    return auth()->user()?->hasRole('admin');
+    // Muestra el menú solo a admin o gerencia
+    return auth()->user()?->hasAnyRole(['admin', 'gerencia']);
 }
 
 public function mount(): void
 {
-    // Bloquea el acceso directo a la URL si no es admin
-    if (! auth()->user()?->hasRole('admin')) {
+    // Bloquea el acceso a quienes no sean admin ni gerencia
+    if (! auth()->user()?->hasAnyRole(['admin', 'gerencia'])) {
         abort(403, 'No tienes permiso para acceder a esta página.');
     }
 }
+
 }

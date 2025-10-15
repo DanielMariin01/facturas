@@ -33,7 +33,7 @@ use Illuminate\Support\Facades\Cache;
 
 class FacturadoResource extends Resource
 {
-    protected static ?string $model = FacturadoVista::class;
+    protected static ?string $model = Facturado::class;
   protected static ?string $navigationIcon = 'heroicon-o-document-currency-dollar';
 protected static ?int $navigationSort = 2;
 
@@ -67,9 +67,13 @@ public static function canEdit(Model $record): bool
     {
         return $table
             ->columns([
-               FBadgeColumn::make('dias_facturado')
-    ->label('Días facturado')
-    ->color(fn ($state) => 
+              FBadgeColumn::make('dias_facturado')
+    ->label('Días Ingreso Facturado')
+    ->getStateUsing(fn($record) => $record->Estado === 'Facturado' 
+        ? $record->dias_facturado 
+        : null
+    )
+    ->color(fn($state) => 
         is_null($state) ? 'gray' : (
             $state <= 1 ? 'success' : (
                 $state <= 3 ? 'warning' : 'danger'
@@ -171,6 +175,11 @@ public static function canEdit(Model $record): bool
                             )
                         );
                     }),
+
+
+
+
+
             ])
             ->filtersLayout(FiltersLayout::AboveContent)
             ->actions([
@@ -200,6 +209,9 @@ public static function canEdit(Model $record): bool
         return [];
     }
 
+
+ 
+
     public static function getPages(): array
     {
         return [
@@ -209,7 +221,11 @@ public static function canEdit(Model $record): bool
         ];
     }
 
-    
-
+             public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+{
+    return parent::getEloquentQuery()
+        ->where('estado', 'facturado')
+        ->selectRaw('facturado.*, DATEDIFF(NOW(), Fecha_Factura) as dias_facturado'); // 👈 aquí aplicas el filtro permanente
+}
 
 }

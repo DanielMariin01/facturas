@@ -62,7 +62,7 @@ protected static ?int $navigationSort = 3;
     {
         return $table
             ->columns([
-               FBadgeColumn::make('dias_paciente_acostado')
+               FBadgeColumn::make('dias_facturado')
     ->label('Días Paciente Acostado')
     ->getStateUsing(fn($record) => $record->Estado === 'Paciente_acostado' 
         ? $record->dias_facturado 

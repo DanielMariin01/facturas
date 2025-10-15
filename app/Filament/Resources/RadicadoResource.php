@@ -48,11 +48,13 @@ protected static ?int $navigationSort = 4;
                 ->label('Codigo'),
 
             // Campo para subir archivos
-        FileUpload::make('archivo')
+FileUpload::make('archivo')
     ->label('Archivo TXT')
-    ->acceptedFileTypes(['text/plain']) // Solo archivos .txt
-    ->required() // Campo obligatorio
-    ->storeFileNamesIn('nombre_archivo')
+    ->acceptedFileTypes(['text/plain'])
+    ->directory('radicados') // guarda los archivos en /storage/app/public/radicados/
+    ->visibility('public') // permite acceso desde el navegador
+    ->required()
+
             ]);
     }
 
@@ -69,7 +71,13 @@ protected static ?int $navigationSort = 4;
             ->label('Código Radicado')
             ->searchable(),
 
-     
+     Tables\Columns\TextColumn::make('archivo')
+    ->label('Archivo TXT')
+    ->formatStateUsing(fn ($state) => $state ? 'Ver archivo' : '-')
+    ->url(fn ($record) => $record->archivo ? Storage::url($record->archivo) : null)
+    ->openUrlInNewTab(),
+
+    
         Tables\Columns\BadgeColumn::make('facturado.estado')
             ->label('Estado')
             ->formatStateUsing(fn ($state) => \App\Enums\Estado::tryFrom($state)?->label() ?? $state)
