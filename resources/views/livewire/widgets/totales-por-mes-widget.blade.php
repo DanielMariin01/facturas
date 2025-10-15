@@ -76,52 +76,109 @@
     </div>
 
     <!-- 🧩 Tabla -->
-    <div style="overflow-x: auto; border: 1px solid #D1D5DB; border-radius: 0.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-        <table style="width: 100%; border-collapse: collapse; min-width: 600px;">
-            <thead style="background-color: #00B5B5; color: white;">
-                <tr>
-                    <th style="padding: 0.5rem 1rem; text-align: left; font-weight: 600; border: 1px solid #D1D5DB;">
-                        EPS / Año
+ <!-- 🧩 Tabla con encabezado fijo -->
+<!-- 🧩 Tabla con encabezado y primera columna fijos -->
+<!-- 🧩 Tabla con encabezado y primera columna fijos -->
+<div style="
+    overflow: auto;
+    max-height: 500px;
+    border: 1px solid #D1D5DB;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+">
+    <table style="width: 100%; border-collapse: collapse; min-width: 800px;">
+        <thead>
+            <tr style="background-color: #00B5B5; color: white;">
+                <th style="
+                    position: sticky;
+                    top: 0;
+                    left: 0;
+                    z-index: 20;
+                    background-color: #00B5B5;
+                    padding: 0.5rem 1rem;
+                    text-align: left;
+                    font-weight: 600;
+                    border: 1px solid #D1D5DB;
+                    min-width: 120px;
+                    max-width: 160px;
+                    white-space: normal;
+                    word-wrap: break-word;
+                ">
+                    EPS / Año
+                </th>
+                @foreach ($meses as $nombreMes)
+                    <th style="
+                        position: sticky;
+                        top: 0;
+                        z-index: 10;
+                        background-color: #00B5B5;
+                        padding: 0.5rem 1rem;
+                        text-align: right;
+                        font-weight: 600;
+                        border: 1px solid #D1D5DB;
+                    ">
+                        {{ $nombreMes }}
                     </th>
+                @endforeach
+            </tr>
+        </thead>
+
+        <tbody>
+            @forelse ($pivotData as $index => $row)
+                @php
+                    $rowColor = $index % 2 == 0 ? '#f9fafa' : '#eef9f9';
+                @endphp
+                <tr style="background-color: {{ $rowColor }};"
+                    onmouseover="this.style.backgroundColor='#B3EAEA'"
+                    onmouseout="this.style.backgroundColor='{{ $rowColor }}'">
+                    <!-- Columna fija EPS / Año -->
+                    <td style="
+                        position: sticky;
+                        left: 0;
+                        background-color: {{ $rowColor }};
+                        z-index: 15;
+                        padding: 0.5rem 1rem;
+                        font-weight: 500;
+                        color: #1F2937;
+                        border: 1px solid #D1D5DB;
+                        max-width: 160px;
+                        white-space: normal;
+                        word-wrap: break-word;
+                        text-align: left;
+                    ">
+                        {{ $row['eps'] }}
+                    </td>
+
                     @foreach ($meses as $nombreMes)
-                        <th style="padding: 0.5rem 1rem; text-align: right; font-weight: 600; border: 1px solid #D1D5DB;">
-                            {{ $nombreMes }}
-                        </th>
+                        <td style="
+                            padding: 0.5rem 1rem;
+                            text-align: right;
+                            color: #1F2937;
+                            border: 1px solid #D1D5DB;
+                            min-width: 100px;
+                        ">
+                            @if(isset($row['valores'][$nombreMes]))
+                                ${{ number_format($row['valores'][$nombreMes], 0, ',', '.') }}
+                            @else
+                                -
+                            @endif
+                        </td>
                     @endforeach
                 </tr>
-            </thead>
-            <tbody>
-                @forelse ($pivotData as $index => $row)
-                    @php
-                        $rowColor = $index % 2 == 0 ? '#f3fdfdff' : '#f3fdfdff';
-                    @endphp
-                    <tr style="background-color: {{ $rowColor }};"
-                        onmouseover="this.style.backgroundColor='#B3EAEA'"
-                        onmouseout="this.style.backgroundColor='{{ $rowColor }}'">
-                        <td style="padding: 0.5rem 1rem; font-weight: 500; color: #1F2937; border: 1px solid #D1D5DB;">
-                            {{ $row['eps'] }}
-                        </td>
-                        @foreach ($meses as $nombreMes)
-                            <td style="padding: 0.5rem 1rem; text-align: right; color: #1F2937; border: 1px solid #D1D5DB;">
-                                @if(isset($row['valores'][$nombreMes]))
-                                    ${{ number_format($row['valores'][$nombreMes], 0, ',', '.') }}
-                                @else
-                                    -
-                                @endif
-                            </td>
-                        @endforeach
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="{{ count($meses) + 1 }}"
-                            style="padding: 1rem; text-align: center; color: #6B7280; border: 1px solid #D1D5DB;">
-                            No hay datos para los filtros seleccionados.
-                        </td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
+            @empty
+                <tr>
+                    <td colspan="{{ count($meses) + 1 }}"
+                        style="padding: 1rem; text-align: center; color: #6B7280; border: 1px solid #D1D5DB;">
+                        No hay datos para los filtros seleccionados.
+                    </td>
+                </tr>
+            @endforelse
+        </tbody>
+    </table>
+</div>
+
+
+
 
     <!-- 📄 Paginación personalizada -->
     <div style="margin-top: 1rem; display: flex; justify-content: center;">
