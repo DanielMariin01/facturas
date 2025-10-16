@@ -142,7 +142,10 @@ public function updatedConvenioSeleccionado()
        $flat = collect($pivot)->map(fn($val, $convenio) => [
     'convenio' => $convenio,
     'valores' => $val,
-])->values();
+    'total_anual' => array_sum($val),
+])
+      ->sortByDesc('total_anual')
+->values();
 
 
         $totalItems = $flat->count();
