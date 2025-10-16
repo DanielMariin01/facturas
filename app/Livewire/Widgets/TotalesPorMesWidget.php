@@ -26,7 +26,7 @@ class TotalesPorMesWidget extends Component
     public function aplicarFiltros()
 {
     $this->paginaActual = 1;
-    \Log::info("🔍 Aplicando filtros — Estado: {$this->estado}, EPS: {$this->epsSeleccionada}, Convenio: {$this->convenioSeleccionado}");
+    //\Log::info("🔍 Aplicando filtros — Estado: {$this->estado}, EPS: {$this->epsSeleccionada}, Convenio: {$this->convenioSeleccionado}");
 }
 
     // 🔹 Cuando cambia el estado, reiniciamos EPS y página
@@ -34,14 +34,14 @@ class TotalesPorMesWidget extends Component
     {
         $this->epsSeleccionada = '';
         $this->paginaActual = 1;
-        Log::info("✅ Estado cambiado a: {$this->estado}");
+        //Log::info("✅ Estado cambiado a: {$this->estado}");
     }
 
     // 🔹 Cuando cambia la EPS, reiniciamos a la primera página
     public function updatedEpsSeleccionada()
     {
         $this->paginaActual = 1;
-        Log::info("✅ EPS cambiada a: {$this->epsSeleccionada}");
+        //Log::info("✅ EPS cambiada a: {$this->epsSeleccionada}");
     }
 
 
@@ -49,7 +49,7 @@ class TotalesPorMesWidget extends Component
 public function updatedConvenioSeleccionado()
 {
     $this->paginaActual = 1;
-    \Log::info("✅ Convenio cambiado a: {$this->convenioSeleccionado}");
+    //\Log::info("✅ Convenio cambiado a: {$this->convenioSeleccionado}");
 }
 
 
@@ -59,7 +59,7 @@ public function updatedConvenioSeleccionado()
     public function cambiarPagina($numero)
     {
         $this->paginaActual = max(1, (int) $numero);
-        Log::info("📄 Cambiando a página: {$this->paginaActual}");
+       // Log::info("📄 Cambiando a página: {$this->paginaActual}");
     }
 
     // 🔹 Obtener lista de estados (para el select)
@@ -104,7 +104,7 @@ public function updatedConvenioSeleccionado()
     public function render()
     {
         $query = Facturado::selectRaw('
-                EPS,
+              Convenio,
                 YEAR(Fec_Ingreso) as anio,
                 MONTH(Fec_Ingreso) as mes,
                 SUM(Vl_Total) as total
@@ -119,8 +119,8 @@ public function updatedConvenioSeleccionado()
     $valor = strtolower(trim($this->convenioSeleccionado));
     $q->whereRaw("LOWER(TRIM(Convenio)) LIKE ?", ["%{$valor}%"]);
 })
-            ->groupBy('EPS', DB::raw('YEAR(Fec_Ingreso)'), DB::raw('MONTH(Fec_Ingreso)'))
-            ->orderBy('EPS');
+            ->groupBy('Convenio', DB::raw('YEAR(Fec_Ingreso)'), DB::raw('MONTH(Fec_Ingreso)'))
+            ->orderBy('Convenio');
 
         $rawData = $query->get();
 
@@ -133,16 +133,17 @@ public function updatedConvenioSeleccionado()
         // 🔸 Crear estructura tipo pivot EPS(Año) → [Mes => Total]
         $pivot = [];
         foreach ($rawData as $item) {
-            $epsKey = trim($item->EPS) . " ({$item->anio})";
+           $convenioKey = trim($item->Convenio) . " ({$item->anio})";
             $mesNombre = $meses[$item->mes] ?? $item->mes;
-            $pivot[$epsKey][$mesNombre] = $item->total;
+            $pivot[$convenioKey][$mesNombre] = $item->total;
         }
         ksort($pivot);
 
-        $flat = collect($pivot)->map(fn($val, $eps) => [
-            'eps' => $eps,
-            'valores' => $val,
-        ])->values();
+       $flat = collect($pivot)->map(fn($val, $convenio) => [
+    'convenio' => $convenio,
+    'valores' => $val,
+])->values();
+
 
         $totalItems = $flat->count();
         $page = max(1, (int) $this->paginaActual);

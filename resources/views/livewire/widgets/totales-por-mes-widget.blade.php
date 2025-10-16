@@ -104,7 +104,7 @@
                     white-space: normal;
                     word-wrap: break-word;
                 ">
-                    EPS / Año
+                    Convenio
                 </th>
                 @foreach ($meses as $nombreMes)
                     <th style="
@@ -146,7 +146,7 @@
                         word-wrap: break-word;
                         text-align: left;
                     ">
-                        {{ $row['eps'] }}
+                        {{ $row['convenio'] }}
                     </td>
 
                     @foreach ($meses as $nombreMes)
