@@ -25,10 +25,11 @@ class ListFacturados extends ListRecords
         parent::mount();
 
         Notification::make()
-            ->title('Recuerda tus tareas pendientes')
-            ->body('Por favor revisa y completa las tareas asignadas antes de continuar.')
+            ->title('⚠️ Atención')
+            ->body('🚨 Algunos registros tienen Días de ingreso facturado en rojo. significa que el tiempo máximo para radicar la factura está por vencer.
+👉 ¡Radica cuanto antes para evitar inconvenientes!. ')
             ->warning() // tipos: ->success(), ->danger(), ->info(), ->warning()
-             ->seconds(50)
+             ->seconds(60)
             ->send();
     }
 }
